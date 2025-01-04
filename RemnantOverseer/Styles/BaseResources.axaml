@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System"
+                    xmlns:converters="using:Avalonia.Controls.Converters"
+                    x:ClassModifier="internal">
+
+  <SolidColorBrush x:Key="GlobalBackroundBrush" Color="{StaticResource GlobalBackroundColor}" />
+  <SolidColorBrush x:Key="OuterBorderBrush" Color="{StaticResource OuterBorderColor}" />
+  <SolidColorBrush x:Key="OuterBorderInactiveBrush" Color="{StaticResource OuterBorderInactiveColor}" />
+  <SolidColorBrush x:Key="InnerBorderBrush" Color="{StaticResource InnerBorderColor}" />
+  <SolidColorBrush x:Key="BaseAccentHighBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.8" />
+  <SolidColorBrush x:Key="BaseAccentMediumBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.6" />
+  <SolidColorBrush x:Key="BaseAccentLowBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.4" />
+
+  <!--<BoxShadow x:Key="OuterBorderShadow" Color="{StaticResource OuterBorderColor}"  OffsetX="0" OffsetY="0" Blur="5" Spread="2" />-->
+
+  <SolidColorBrush x:Key="TestButtonBrush">#5e5e5e</SolidColorBrush>
+
+  <LinearGradientBrush x:Key="OuterBorderBrushG" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="#555555" Offset="0.0" />
+    <GradientStop Color="#c4c4c4" Offset="0.5" />
+    <GradientStop Color="#b5b5b5" Offset="1" />
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="TestBG" StartPoint="0%,0%" EndPoint="100%,100%">
+    <GradientStop Color="Black" Offset="0.0" />
+    <GradientStop Color="White" Offset="1" />
+  </LinearGradientBrush>
+
+</ResourceDictionary>

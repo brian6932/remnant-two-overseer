@@ -1,0 +1,237 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:vm="using:RemnantOverseer.ViewModels"
+             xmlns:local="using:RemnantOverseer"
+             xmlns:models="using:RemnantOverseer.Models"
+             xmlns:controls="using:RemnantOverseer.Controls"
+             xmlns:util="using:RemnantOverseer.Utilities"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
+             x:Class="RemnantOverseer.Views.WorldView"
+             x:DataType="vm:WorldViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <!--<vm:WorldViewModel />-->
+  </Design.DataContext>
+
+  <UserControl.Resources>
+    <util:ItemTypeToIconConverter x:Key="ItemTypeToIconConverter" />
+    <sys:Double x:Key="IconSize">20</sys:Double>
+  </UserControl.Resources>
+
+  <Grid Name="OverlayGrid">
+      <!-- Location selection and item tree -->
+      <Grid Name="ContentGrid" RowDefinitions="Auto, *" Margin="5">
+
+        <!-- Completion Icon -->
+        <!--<StackPanel Grid.Row="1" Orientation="Vertical" IsVisible="" VerticalAlignment="Center">
+          <PathIcon Height="150" Width="150" Margin="0 0 0 20"
+                    Foreground="{StaticResource BaseTextColor}"
+                    Data="{StaticResource FinishedIcon}" HorizontalAlignment="Center"/>
+          <TextBlock Text="Nothing left to collect" FontSize="30" HorizontalAlignment="Center"/>
+        </StackPanel>-->
+
+        <!-- Top ribbon -->
+        <Grid Grid.Row="0" Background="Transparent" ColumnDefinitions="Auto, Auto, *, Auto" Margin="10">
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style Selector="Button /template/ ContentPresenter">
+              <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style Selector="Button, ToggleButton">
+              <Setter Property="Margin" Value="0 0 10 0" />
+            </Style>
+          </Grid.Styles>
+          
+          <StackPanel Grid.Column="0" Orientation="Horizontal" >
+            <!-- CampaignAdventureToggle -->
+            <ToggleButton Width="140" IsChecked="{Binding IsCampaignSelected, Mode=TwoWay}">
+              <!-- Reference: https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/ToggleButton.xaml -->
+              <ToggleButton.Styles>
+                <Style Selector="ToggleButton:not(:checked) /template/ ContentPresenter">
+                  <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
+                  <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForeground}" />
+                </Style>
+                <Style Selector="ToggleButton:checked /template/ ContentPresenter">
+                  <!--<Setter Property="Background" Value="{StaticResource BaseAccentColor}" />-->
+                  <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
+                  <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForeground}" />
+                </Style>
+              </ToggleButton.Styles>
+              <Grid ColumnDefinitions="30, *">
+                <PathIcon Grid.Column="0" Data="{StaticResource CampaignIcon}" IsVisible="{Binding $parent[ToggleButton].IsChecked}" Width="20" Margin="5 0"/>
+                <PathIcon Grid.Column="0" Data="{StaticResource AdventureIcon}" IsVisible="{Binding !$parent[ToggleButton].IsChecked}" Width="20" Margin="5 0"/>
+                <TextBlock Grid.Column="1" Text="Campaign" IsVisible="{Binding $parent[ToggleButton].IsChecked}"/>
+                <TextBlock Grid.Column="1" Text="Adventure" IsVisible="{Binding !$parent[ToggleButton].IsChecked}"/>
+              </Grid>
+            </ToggleButton>
+          </StackPanel>
+          
+          <!-- Quick filters -->
+          <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <!-- Could just make them radios honestly. But I have no time nor desire to style them -->
+            <ToggleButton IsVisible="{Binding IsCampaignSelected}" IsChecked="{Binding IsNerudFilterChecked}" Command="{Binding NerudFilterToggledCommand}">
+              <!-- This is a secret tool that will help us later: CommandParameter="{Binding $self.IsChecked}" -->
+              <Grid ColumnDefinitions="Auto, *">
+                <PathIcon Grid.Column="0" Data="{StaticResource NerudIcon}" Width="18" Margin="5 0"/>
+                <TextBlock Grid.Column="1" Text="N'Erud" Margin="0 0 5 0"/>
+              </Grid>
+            </ToggleButton>
+            <ToggleButton IsVisible="{Binding IsCampaignSelected}" IsChecked="{Binding IsYaeshaFilterChecked}" Command="{Binding YaeshaFilterToggledCommand}">
+              <Grid ColumnDefinitions="Auto, *">
+                <PathIcon Grid.Column="0" Data="{StaticResource YaeshaIcon}" Width="18" Margin="5 0"/>
+                <TextBlock Grid.Column="1" Text="Yaesha" Margin="0 0 5 0"/>
+              </Grid>
+            </ToggleButton>
+            <ToggleButton IsVisible="{Binding IsCampaignSelected}" IsChecked="{Binding IsLosomnFilterChecked}" Command="{Binding LosomnFilterToggledCommand}">
+              <Grid ColumnDefinitions="Auto, *">
+                <PathIcon Grid.Column="0" Data="{StaticResource LosomnIcon}" Width="18" Margin="5 0"/>
+                <TextBlock Grid.Column="1" Text="Losomn" Margin="0 0 5 0"/>
+              </Grid>
+            </ToggleButton>
+
+            <Button Command="{Binding ExpandTreeNodesCommand}">
+              <Grid ColumnDefinitions="Auto, *">
+              <PathIcon Grid.Column="0" Data="{StaticResource SquareMinusIcon}" IsVisible="{Binding IsGlobalExpandOn}" Width="14" Margin="5 0"/>
+              <PathIcon Grid.Column="0" Data="{StaticResource SquarePlusIcon}" IsVisible="{Binding !IsGlobalExpandOn}" Width="14" Margin="5 0"/>
+              <TextBlock Grid.Column="1" Text="Collapse All" IsVisible="{Binding IsGlobalExpandOn}" Margin="0 0 5 0"/>
+              <TextBlock Grid.Column="1" Text="Expand All" IsVisible="{Binding !IsGlobalExpandOn}" Margin="0 0 5 0"/>
+              </Grid>
+            </Button>
+          </StackPanel>
+
+          <Grid Grid.Column="3" ColumnDefinitions="Auto, Auto, *">
+            <ToggleButton Grid.Column="0"  IsChecked="{Binding HideDuplicates}">
+              <ToolTip.Tip>
+                <Panel>
+                <TextBlock IsVisible="{Binding HideDuplicates}" Text="Toggle Duplicates (Hiding)" />
+                <TextBlock IsVisible="{Binding !HideDuplicates}" Text="Toggle Duplicates (Showing)" />
+                </Panel>
+              </ToolTip.Tip>
+              <Grid ColumnDefinitions="Auto">
+                <PathIcon Data="{StaticResource HidingDuplicatesIcon}" IsVisible="{Binding HideDuplicates}" Width="14" Margin="5 0"/>
+                <PathIcon Data="{StaticResource ShowingDuplicatesIcon}" IsVisible="{Binding !HideDuplicates}" Width="14" Margin="5 0"/>
+              </Grid>
+            </ToggleButton>
+            <Button Grid.Column="1"  Command="{Binding ResetFiltersCommand}" ToolTip.Tip="Reset Filters">
+              <Grid ColumnDefinitions="Auto">
+                <PathIcon Grid.Column="0" Data="{StaticResource ResetIcon}" Width="14" Margin="5 0"/>
+              </Grid>
+            </Button>
+            <TextBox Grid.Column="2" Name="FilterBox" Text="{Binding FilterText}" MinWidth="250" MaxWidth="450" Watermark="Find items or events" />
+          </Grid>
+        </Grid>
+
+        <!-- Items -->
+        <TreeView Grid.Row="1" ItemsSource="{Binding FilteredZones}" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible">
+          <TreeView.Styles>
+            <Style Selector="ToggleButton#PART_ExpandCollapseChevron">
+              <Style Selector="^:not(:checked) /template/ Path#ChevronPath">
+                <Setter Property="Data" Value="{StaticResource SquarePlusIcon}" />
+              </Style>
+              <Style Selector="^:checked /template/ Path#ChevronPath">
+                <Setter Property="Data" Value="{StaticResource SquareMinusIcon}" />
+              </Style>
+            </Style>
+            <Style Selector="TextBlock">
+              <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style Selector="PathIcon">
+              <Setter Property="Height" Value="{StaticResource IconSize}" />
+              <Setter Property="Width" Value="{StaticResource IconSize}" />
+            </Style>
+            <Style Selector="PathIcon:disabled">
+              <Setter Property="Foreground" Value="{StaticResource BaseTextDisabledColor}" />
+              <Setter Property="Opacity" Value="0.5" />
+            </Style>
+          </TreeView.Styles>
+          <TreeView.DataTemplates>
+            <TreeDataTemplate DataType="models:Zone" ItemsSource="{Binding Locations}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="5,0,0,0"  Text="{Binding Name}" />
+              </StackPanel>
+            </TreeDataTemplate>
+
+            <TreeDataTemplate DataType="models:Location" ItemsSource="{Binding Items}">
+              <Grid ColumnDefinitions="Auto, Auto, *">
+                <Grid Grid.Column="0" ColumnDefinitions="*, Auto">
+                  <TextBlock Grid.Column="0" Margin="5,0,5,0" Text="{Binding Name}"/>
+                  <!-- Need to map 131 files for this to work :( -->
+                  <!--<PathIcon Grid.Column="1" Data="{StaticResource ImageIcon}" Margin="5 0"/>-->
+                </Grid>
+                <Grid Grid.Column="1" ColumnDefinitions="Auto, Auto, Auto, Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource TraitBookIcon}" IsVisible="{Binding IsTraitBookPresent}" IsEnabled="{Binding IsTraitBookLooted}" ToolTip.Tip="Trait Book Available" Margin="5 0"/>
+                  <PathIcon Grid.Column="1" Data="{StaticResource SimulacrumIcon2}" IsVisible="{Binding IsSimulacrumPresent}" IsEnabled="{Binding IsSimulacrumLooted}" ToolTip.Tip="Simulacrum Available" Margin="5 0"/>
+                  <PathIcon Grid.Column="2" Data="{StaticResource BloodmoonIcon}" IsVisible="{Binding IsBloodmoon}" Foreground="{StaticResource BaseAccentColor}" ToolTip.Tip="Bloodmoon" Margin="5 0"/>
+                  <PathIcon Grid.Column="2" Data="{StaticResource CurrentLocationIcon}" IsVisible="{Binding IsRespawnLocation}" Foreground="{StaticResource ZoneTransitionColor}" ToolTip.Tip="{Binding FormattedRespawnPointName}" Margin="5 0"/>
+                </Grid>
+              </Grid>
+            </TreeDataTemplate>
+
+            <TreeDataTemplate DataType="models:Item">
+              <Grid ColumnDefinitions="Auto, Auto, *, Auto, 130">
+                <!-- Col 4: 20*2 + (5*2 + 20)*3 -->
+                <Grid.Styles>
+                  <Style Selector="TextBlock:disabled">
+                    <Setter Property="Foreground" Value="{StaticResource BaseTextDisabledColor}" />
+                  </Style>
+                </Grid.Styles>
+                <!-- Could put these two in a container -->
+                <PathIcon Grid.Column="0" Height="20" Width="20" Margin="0 0 10 0"
+                          Data="{Binding Type, Converter={StaticResource ItemTypeToIconConverter}}"
+                          ToolTip.Tip="{Binding Type}"
+                          IsEnabled="{Binding !IsLooted}"/>
+                
+                <TextBlock Grid.Column="1" Text="{Binding Name}"  IsEnabled="{Binding !IsLooted}"
+                           ToolTip.Tip="Can't be looted in the current world state. For example, if the quest has already been completed and an alternative reward was chosen"
+                           ToolTip.ServiceEnabled="{Binding IsLooted}" ToolTip.ShowOnDisabled="True" />
+
+                <!-- Column 2 is reserved for spacing-->
+
+                <Grid Grid.Column="3" ColumnDefinitions="Auto, *" Width="350" IsVisible="{Binding OriginNameFormatted, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" >
+                  <PathIcon Grid.Column="0" Margin="10 0 5 0" Data="{StaticResource InjectableIcon}" Height="{StaticResource IconSize}" Width="{StaticResource IconSize}"/>
+                  <TextBlock Grid.Column="1" Text="{Binding OriginNameFormatted}" TextTrimming="CharacterEllipsis" />
+                </Grid>
+                                
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="20 0 20 0">
+                  <StackPanel.Styles>
+                    <Style Selector="PathIcon">
+                      <Setter Property="Height" Value="{StaticResource IconSize}" />
+                      <Setter Property="Width" Value="{StaticResource IconSize}" />
+                      <Setter Property="Margin" Value="5 0" />
+                      <Setter Property="Foreground" Value="{StaticResource BaseTextColor}" />
+                    </Style>
+                  </StackPanel.Styles>
+                  <!-- consider always showing icons, but very faint if not applicable for layout consistency -->
+                  <!--<PathIcon Height="{StaticResource IconSize}" Width="{StaticResource IconSize}" Margin="5 0" Foreground="{StaticResource BaseTextColor}" Data="{StaticResource CoopIcon}"/>-->
+                  <PathIcon Data="{StaticResource RoundInfoIcon}" IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" ToolTip.Tip="{Binding Description}" ToolTip.Placement="LeftEdgeAlignedTop"/>
+                  <PathIcon Data="{StaticResource CoopIcon}" IsVisible="{Binding IsCoop}" ToolTip.Tip="Co-op required" ToolTip.Placement="LeftEdgeAlignedTop"/>
+                </StackPanel>
+              </Grid>
+            </TreeDataTemplate>
+          </TreeView.DataTemplates>
+
+          <!-- Why? -->
+          <!-- https://stackoverflow.com/questions/77275239/how-to-properly-expand-a-treeviewitem-in-avalonia -->
+          <TreeView.ItemContainerTheme>
+            <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+              <!-- Why? -->
+              <!-- https://docs.avaloniaui.net/docs/guides/data-binding/binding-to-controls -->
+              <!-- Consider doing per item in the future https://github.com/AvaloniaUI/Avalonia/discussions/13903 -->
+              <Setter Property="IsExpanded" Value="{Binding $parent[TreeView].((vm:WorldViewModel)DataContext).IsGlobalExpandOn, Mode=OneWay}" />
+            </ControlTheme>
+          </TreeView.ItemContainerTheme>
+
+        </TreeView>
+
+      </Grid>
+    <Border IsVisible="{Binding IsLoading}" Background="#40000000">
+      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading</TextBlock>
+    </Border>
+  </Grid>
+</UserControl>

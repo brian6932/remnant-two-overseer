@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:svc="using:RemnantOverseer.Services"
+             xmlns:vm="using:RemnantOverseer.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="RemnantOverseer.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             svc:FileDialogManager.Register="{Binding}">
+
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0" Margin="20">
+      <Grid RowDefinitions="Auto, Auto">
+        <TextBlock Grid.Row="0" Text="Save file location" FontWeight="DemiBold" FontSize="16" Margin="5"/>
+        <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+          <Border Grid.Column="0" BorderThickness="2" CornerRadius="3" BorderBrush="{StaticResource OuterBorderInactiveBrush}" Padding="10 0">
+            <TextBlock Height="16" Text="{Binding FilePath}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+          </Border>
+          <Button Grid.Column="1" Command="{Binding OpenFileCommand}" Content="Click me" Margin="5 0 0 0">
+            <PathIcon Height="20" Width="20" Foreground="{StaticResource BaseTextColor}"
+                    Data="{StaticResource FolderOpenIcon}"/>
+          </Button>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+
+</UserControl>
