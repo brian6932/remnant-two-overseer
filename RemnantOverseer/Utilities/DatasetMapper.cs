@@ -96,21 +96,7 @@ internal class DatasetMapper
                 {
                     foreach (var item in lootGroup.Items)
                     {
-                        Enum.TryParse<ItemTypes>(item.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
-                        Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
-                        var itemModel = new Models.Item
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            Description = item.ItemNotes,
-                            IsLooted = item.IsLooted,
-                            Type = itemType,
-                            OriginType = originType,
-                            OriginName = lootGroup.Name ?? string.Empty,
-
-                            IsDuplicate = !missingItemIds.Contains(item.Id),
-                            IsCoop = item.Properties.ContainsKey("Coop") && item.Properties["Coop"] == "True"
-                        };
+                        var itemModel = MapLootItemToItem(item, lootGroup, !missingItemIds.Contains(item.Id));
                         locationModel.Items.Add(itemModel);
                     }
                 }
