@@ -1,0 +1,145 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:svc="using:RemnantOverseer.Services"
+             xmlns:vm="using:RemnantOverseer.ViewModels"
+             xmlns:util="using:RemnantOverseer.Utilities"
+             xmlns:local="using:RemnantOverseer"
+             xmlns:models="using:RemnantOverseer.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="RemnantOverseer.Views.MissingItemsView"
+             x:DataType="vm:MissingItemsViewModel">
+
+  <UserControl.Resources>
+    <util:ItemTypeToIconConverter x:Key="ItemTypeToIconConverter" />
+    <sys:Double x:Key="IconSize">20</sys:Double>
+  </UserControl.Resources>
+
+  <Grid Name="OverlayGrid">
+    <!-- Location selection and item tree -->
+    <Grid Name="ContentGrid" RowDefinitions="Auto, *" Margin="5">
+
+      <!-- Top ribbon -->
+      <Grid Grid.Row="0" Background="Transparent" ColumnDefinitions="Auto, *, Auto" Margin="10">
+        <Grid.Styles>
+          <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+          </Style>
+          <Style Selector="Button /template/ ContentPresenter">
+            <Setter Property="FontSize" Value="16" />
+          </Style>
+          <Style Selector="Button, ToggleButton">
+            <Setter Property="Margin" Value="0 0 10 0" />
+          </Style>
+        </Grid.Styles>
+
+        <Button Grid.Column="0" Command="{Binding ExpandTreeNodesCommand}">
+          <Grid ColumnDefinitions="Auto, *">
+            <PathIcon Grid.Column="0" Data="{StaticResource SquareMinusIcon}" IsVisible="{Binding IsGlobalExpandOn}" Width="14" Margin="5 0"/>
+            <PathIcon Grid.Column="0" Data="{StaticResource SquarePlusIcon}" IsVisible="{Binding !IsGlobalExpandOn}" Width="14" Margin="5 0"/>
+            <TextBlock Grid.Column="1" Text="Collapse All" IsVisible="{Binding IsGlobalExpandOn}" Margin="0 0 5 0"/>
+            <TextBlock Grid.Column="1" Text="Expand All" IsVisible="{Binding !IsGlobalExpandOn}" Margin="0 0 5 0"/>
+          </Grid>
+        </Button>
+
+        <Grid Grid.Column="2" ColumnDefinitions="Auto, *">
+          <Button Grid.Column="0"  Command="{Binding ResetFiltersCommand}" ToolTip.Tip="Reset Filters">
+            <Grid ColumnDefinitions="Auto">
+              <PathIcon Grid.Column="0" Data="{StaticResource ResetIcon}" Width="14" Margin="5 0"/>
+            </Grid>
+          </Button>
+          <TextBox Grid.Column="1" Name="FilterBox" Text="{Binding FilterText}" MinWidth="250" MaxWidth="450" Watermark="Find items or events" />
+        </Grid>
+      </Grid>
+
+      <!-- Items -->
+      <TreeView Grid.Row="1" ItemsSource="{Binding FilteredItemCategories}" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible">
+        <TreeView.Styles>
+          <Style Selector="ToggleButton#PART_ExpandCollapseChevron">
+            <Style Selector="^:not(:checked) /template/ Path#ChevronPath">
+              <Setter Property="Data" Value="{StaticResource SquarePlusIcon}" />
+            </Style>
+            <Style Selector="^:checked /template/ Path#ChevronPath">
+              <Setter Property="Data" Value="{StaticResource SquareMinusIcon}" />
+            </Style>
+          </Style>
+          <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+          </Style>
+          <Style Selector="PathIcon">
+            <Setter Property="Height" Value="{StaticResource IconSize}" />
+            <Setter Property="Width" Value="{StaticResource IconSize}" />
+          </Style>
+          <Style Selector="PathIcon:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BaseTextDisabledColor}" />
+            <Setter Property="Opacity" Value="0.5" />
+          </Style>
+        </TreeView.Styles>
+        <TreeView.DataTemplates>
+          <TreeDataTemplate DataType="models:ItemCategory" ItemsSource="{Binding Items}">
+            <StackPanel Orientation="Horizontal">
+              <PathIcon Height="{StaticResource IconSize}" Width="{StaticResource IconSize}" Margin="5 0 10 0"
+                        Data="{Binding Type, Converter={StaticResource ItemTypeToIconConverter}}"/>
+              <TextBlock Text="{Binding Name}" />
+            </StackPanel>
+          </TreeDataTemplate>
+
+          <TreeDataTemplate DataType="models:Item">
+            <Grid ColumnDefinitions="Auto, *, Auto, 130">
+              <!-- Col 4: 20*2 + (5*2 + 20)*3 -->
+              <Grid.Styles>
+                <Style Selector="TextBlock:disabled">
+                  <Setter Property="Foreground" Value="{StaticResource BaseTextDisabledColor}" />
+                </Style>
+              </Grid.Styles>
+              <TextBlock Grid.Column="0" Text="{Binding Name}"  IsEnabled="{Binding !IsLooted}"
+                         ToolTip.Tip="Can't be looted in the current world state. For example, if the quest has already been completed and an alternative reward was chosen"
+                         ToolTip.ServiceEnabled="{Binding IsLooted}" ToolTip.ShowOnDisabled="True" />
+
+              <!-- Column 2 is reserved for spacing-->
+
+              <!--<Grid Grid.Column="3" ColumnDefinitions="Auto, *" Width="350" IsVisible="{Binding OriginNameFormatted, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" >
+                <PathIcon Grid.Column="0" Margin="10 0 5 0" Data="{StaticResource InjectableIcon}" Height="{StaticResource IconSize}" Width="{StaticResource IconSize}"/>
+                <TextBlock Grid.Column="1" Text="{Binding OriginNameFormatted}" TextTrimming="CharacterEllipsis" />
+              </Grid>-->
+
+              <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="20 0 20 0">
+                <StackPanel.Styles>
+                  <Style Selector="PathIcon">
+                    <Setter Property="Height" Value="{StaticResource IconSize}" />
+                    <Setter Property="Width" Value="{StaticResource IconSize}" />
+                    <Setter Property="Margin" Value="5 0" />
+                    <Setter Property="Foreground" Value="{StaticResource BaseTextColor}" />
+                  </Style>
+                </StackPanel.Styles>
+                <!-- consider always showing icons, but very faint if not applicable for layout consistency -->
+                <!--<PathIcon Height="{StaticResource IconSize}" Width="{StaticResource IconSize}" Margin="5 0" Foreground="{StaticResource BaseTextColor}" Data="{StaticResource CoopIcon}"/>-->
+                <PathIcon Data="{StaticResource RoundInfoIcon}" IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" ToolTip.Tip="{Binding Description}" ToolTip.Placement="LeftEdgeAlignedTop"/>
+                <PathIcon Data="{StaticResource CoopIcon}" IsVisible="{Binding IsCoop}" ToolTip.Tip="Co-op required" ToolTip.Placement="LeftEdgeAlignedTop"/>
+              </StackPanel>
+            </Grid>
+          </TreeDataTemplate>
+        </TreeView.DataTemplates>
+
+        <!-- Why? -->
+        <!-- https://stackoverflow.com/questions/77275239/how-to-properly-expand-a-treeviewitem-in-avalonia -->
+        <TreeView.ItemContainerTheme>
+          <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+            <!-- Why? -->
+            <!-- https://docs.avaloniaui.net/docs/guides/data-binding/binding-to-controls -->
+            <!-- Consider doing per item in the future https://github.com/AvaloniaUI/Avalonia/discussions/13903 -->
+            <Setter Property="IsExpanded" Value="{Binding $parent[TreeView].((vm:MissingItemsViewModel)DataContext).IsGlobalExpandOn, Mode=OneWay}" />
+          </ControlTheme>
+        </TreeView.ItemContainerTheme>
+
+      </TreeView>
+
+    </Grid>
+    <Border IsVisible="{Binding IsLoading}" Background="#40000000">
+      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading</TextBlock>
+    </Border>
+  </Grid>
+
+</UserControl>

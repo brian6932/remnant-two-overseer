@@ -11,7 +11,7 @@ public partial class WorldView : UserControl
         {
             // This can be before or after InitializeComponent.
             var settingsService = new Services.SettingsService();
-            Design.SetDataContext(this, new WorldViewModel(new Services.SaveDataService(settingsService), settingsService));
+            Design.SetDataContext(this, new WorldViewModel(new Services.SaveDataService(settingsService)));
         }
         InitializeComponent();
     }

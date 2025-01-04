@@ -90,7 +90,7 @@
                 Data="{StaticResource WorldIcon}"/>
           </RadioButton>
 
-          <RadioButton Grid.Row="2" Classes="SidebarButton"  GroupName="SideMenuButtons" Theme="{StaticResource ButtonWithBorder}" 
+          <RadioButton Grid.Row="2" Classes="SidebarButton"  GroupName="SideMenuButtons" Theme="{StaticResource ButtonWithBorder}" Command="{Binding SwitchToMissingItemsViewCommand}" IsChecked="{Binding IsMissingItemsViewSelected}"
                        ToolTip.Tip="Missing Items" ToolTip.ShowDelay="700" ToolTip.Placement="RightEdgeAlignedTop">
             <PathIcon Height="{StaticResource IconSize}" Width="{StaticResource IconSize}" Foreground="{StaticResource BaseTextColor}"
                 Data="{StaticResource MissingItemsIcon}"/>

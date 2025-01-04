@@ -41,7 +41,20 @@ internal class DatasetMapper
         }
 
         // Just in case
-        result.CharacterList = result.CharacterList.OrderBy((m) => m.Index).ToList();
+        result.CharacterList = [.. result.CharacterList.OrderBy((m) => m.Index)];
+
+        return result;
+    }
+
+    public static MappedMissingItems MapMissingItems(List<Dictionary<string, string>> missingItemsDict)
+    {
+        var result = new MappedMissingItems();
+        foreach(var missingItem in missingItemsDict)
+        {
+            var lootItem = new LootItem() { Properties = missingItem };
+            var item = MapLootItemToItem(lootItem);
+            result.ItemCategoryList[(int)item.Type].Items.Add(item);
+        }
 
         return result;
     }
@@ -98,10 +111,6 @@ internal class DatasetMapper
                             IsDuplicate = !missingItemIds.Contains(item.Id),
                             IsCoop = item.Properties.ContainsKey("Coop") && item.Properties["Coop"] == "True"
                         };
-                        if (itemModel.OriginName.StartsWith("Monster in the"))
-                        {
-                            ;
-                        }
                         locationModel.Items.Add(itemModel);
                     }
                 }
@@ -143,6 +152,43 @@ internal class DatasetMapper
         return result;
     }
 
+    private static Models.Item MapLootItemToItem(LootItem lootItem)
+    {
+        Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
+        var itemModel = new Models.Item
+        {
+            Id = lootItem.Id,
+            Name = lootItem.Name,
+            Description = lootItem.ItemNotes,
+            IsLooted = lootItem.IsLooted,
+            Type = itemType,
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+        };
+
+        return itemModel;
+    }
+
+    private static Models.Item MapLootItemToItem(LootItem lootItem, LootGroup lootGroup, bool isDuplicate)
+    {
+        Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
+        Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
+        var itemModel = new Models.Item
+        {
+            Id = lootItem.Id,
+            Name = lootItem.Name,
+            Description = lootItem.ItemNotes,
+            IsLooted = lootItem.IsLooted,
+            Type = itemType,
+            OriginType = originType,
+            OriginName = lootGroup.Name ?? string.Empty,
+
+            IsDuplicate = isDuplicate,
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+        };
+
+        return itemModel;
+    }
+
     private static void SetAsRespawnLocation(Models.Location locationModel, RespawnPoint respawnPoint)
     {
         locationModel.IsRespawnLocation = true;
@@ -151,7 +197,7 @@ internal class DatasetMapper
     }
 }
 
-    internal class MappedZones
+internal class MappedZones
 {
     public List<Models.Zone> CampaignZoneList { get; set; } = [];
     public List<Models.Zone> AdventureZoneList { get; set; } = [];
@@ -160,4 +206,17 @@ internal class DatasetMapper
 internal class MappedCharacters
 {
     public List<Models.Character> CharacterList { get; set; } = [];
+}
+
+internal class MappedMissingItems
+{
+    public List<Models.ItemCategory> ItemCategoryList { get; set; } = [];
+
+    public MappedMissingItems()
+    {
+        foreach(var type in Enum.GetValues<ItemTypes>())
+        {
+            ItemCategoryList.Add(new Models.ItemCategory() { Type = type });
+        }
+    }
 }

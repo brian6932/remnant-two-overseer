@@ -1,9 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RemnantOverseer.Services;
@@ -50,6 +48,7 @@ public partial class App : Application
                     .AddTransient<MainWindowViewModel>()
                     .AddSingleton<CharacterSelectViewModel>()
                     .AddSingleton<SettingsViewModel>()
+                    .AddSingleton<MissingItemsViewModel>()
                     .AddSingleton<WorldViewModel>();
                     //.AddTransient<DebugViewModel>();
             })          

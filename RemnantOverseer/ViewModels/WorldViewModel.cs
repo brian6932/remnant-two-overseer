@@ -29,7 +29,7 @@ public partial class WorldViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLoading = false;
 
-    public WorldViewModel(SaveDataService saveDataService, SettingsService settingsService)
+    public WorldViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
         Task.Run(async () => { await ReadSave(0, true); this.IsActive = true; });
@@ -142,7 +142,6 @@ public partial class WorldViewModel : ViewModelBase
         ApplyFilter(FilterText);
     }
 
-    // TODO: Optimize this. How is it so slow? Removing string comparisons does nothing
     private void ApplyFilter(string? value)
     {
         //optimization, not compatible with hide dupes
@@ -206,6 +205,9 @@ public partial class WorldViewModel : ViewModelBase
         if (isCharacterCountChanged)
         {
             characterIndex = dataset.ActiveCharacterIndex;
+            ResetLocationToggles();
+            _filterText = null;
+            OnPropertyChanged(nameof(FilterText));
         }
 
         _mappedZones = DatasetMapper.MapCharacterToZones(dataset.Characters[characterIndex]);
@@ -221,9 +223,6 @@ public partial class WorldViewModel : ViewModelBase
             OnPropertyChanged(nameof(IsCampaignSelected));
         }
 
-        ResetLocationToggles();
-        _filterText = null;
-        OnPropertyChanged(nameof(FilterText));
         ApplyFilter();
 
         IsLoading = false;

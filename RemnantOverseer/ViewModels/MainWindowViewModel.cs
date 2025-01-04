@@ -22,6 +22,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private bool _isWorldViewSelected;
 
     [ObservableProperty]
+    private bool _isMissingItemsViewSelected;
+
+    [ObservableProperty]
     private bool _isSettingsViewSelected;
 
     public MainWindowViewModel(SettingsService settingsService, SaveDataService saveDataService)
@@ -51,6 +54,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         if (ContentViewModel is CharacterSelectViewModel) return;
         ContentViewModel = App.Resolve<CharacterSelectViewModel>();
         IsCharacterViewSelected = true;
+    }
+
+    [RelayCommand]
+    public void SwitchToMissingItemsView()
+    {
+        if (ContentViewModel is MissingItemsViewModel) return;
+        ContentViewModel = App.Resolve<MissingItemsViewModel>();
+        IsMissingItemsViewSelected = true;
     }
 
     [RelayCommand]
