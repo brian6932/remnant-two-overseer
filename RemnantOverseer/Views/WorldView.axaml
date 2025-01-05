@@ -11,11 +11,6 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
              x:Class="RemnantOverseer.Views.WorldView"
              x:DataType="vm:WorldViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <!--<vm:WorldViewModel />-->
-  </Design.DataContext>
 
   <UserControl.Resources>
     <util:ItemTypeToIconConverter x:Key="ItemTypeToIconConverter" />
@@ -58,7 +53,6 @@
                   <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForeground}" />
                 </Style>
                 <Style Selector="ToggleButton:checked /template/ ContentPresenter">
-                  <!--<Setter Property="Background" Value="{StaticResource BaseAccentColor}" />-->
                   <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
                   <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForeground}" />
                 </Style>

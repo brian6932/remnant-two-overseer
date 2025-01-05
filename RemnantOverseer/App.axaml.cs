@@ -34,14 +34,8 @@ public partial class App : Application
     {
         AppHost = Host.CreateDefaultBuilder()
             .UseContentRoot(AppContext.BaseDirectory)
-            //.ConfigureAppConfiguration(builder =>
-            //{
-            //    builder.Sources.Clear();
-            //    builder.AddJsonFile("settings.json");
-            //})
             .ConfigureServices((context, services) =>
             {
-                //services.AddOptions<Settings>().Bind(context.Configuration);
                 services
                     .AddSingleton<SettingsService>()
                     .AddSingleton<SaveDataService>()
