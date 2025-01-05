@@ -16,8 +16,6 @@ public class SaveDataService
     private readonly SettingsService _settingsService;
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     Subject<DateTime> _fileUpdateSubject = new Subject<DateTime>();
-
-    private string[]? _profileSummaries;
     private Dataset? _dataset;
     private int _lastCharacterCount = 0;
 
@@ -82,7 +80,6 @@ public class SaveDataService
 
     public void Reset()
     {
-        _profileSummaries = null;
         _dataset = null;
     }
 

@@ -1,8 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="using:System"
-                    xmlns:converters="using:Avalonia.Controls.Converters"
-                    x:ClassModifier="internal">
+                    xmlns:converters="using:Avalonia.Controls.Converters">
 
   <SolidColorBrush x:Key="GlobalBackroundBrush" Color="{StaticResource GlobalBackroundColor}" />
   <SolidColorBrush x:Key="OuterBorderBrush" Color="{StaticResource OuterBorderColor}" />

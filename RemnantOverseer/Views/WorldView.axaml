@@ -230,8 +230,7 @@
         </TreeView>
 
       </Grid>
-    <Border IsVisible="{Binding IsLoading}" Background="#40000000">
-      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading</TextBlock>
-    </Border>
+
+    <controls:LoadingIndicator IsLoading="{Binding IsLoading}"/>
   </Grid>
 </UserControl>

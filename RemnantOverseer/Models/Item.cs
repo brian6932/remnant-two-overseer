@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace RemnantOverseer.Models;
 public class Item
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public ItemTypes Type { get; set; }
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
     public OriginTypes OriginType { get; set; }
-    public string OriginName { get; set; }
+    public string OriginName { get; set; } = string.Empty;
     public bool IsDuplicate { get; set; }
     public bool IsLooted { get; set; }
     public bool IsCoop { get; set; }

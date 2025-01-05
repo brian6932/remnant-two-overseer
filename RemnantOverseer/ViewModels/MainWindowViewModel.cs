@@ -27,7 +27,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool _isSettingsViewSelected;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. (Is set in SwitchToWorldView)
     public MainWindowViewModel(SettingsService settingsService, SaveDataService saveDataService)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     {
         _settingsService = settingsService;
         _saveDataService = saveDataService;

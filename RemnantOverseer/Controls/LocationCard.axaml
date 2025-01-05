@@ -24,7 +24,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel>
-          <Image Source="/Assets/Images/question-banner.png" />
+          <!--<Image Source="/Assets/Images/question-banner.png" />-->
           <TextBlock HorizontalAlignment="Center" Text="{TemplateBinding Title}" />
         </StackPanel>
       </ControlTemplate>

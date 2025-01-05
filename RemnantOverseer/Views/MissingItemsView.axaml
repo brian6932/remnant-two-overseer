@@ -8,6 +8,7 @@
              xmlns:util="using:RemnantOverseer.Utilities"
              xmlns:local="using:RemnantOverseer"
              xmlns:models="using:RemnantOverseer.Models"
+             xmlns:controls="using:RemnantOverseer.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="RemnantOverseer.Views.MissingItemsView"
              x:DataType="vm:MissingItemsViewModel">
@@ -133,13 +134,9 @@
             <Setter Property="IsExpanded" Value="{Binding $parent[TreeView].((vm:MissingItemsViewModel)DataContext).IsGlobalExpandOn, Mode=OneWay}" />
           </ControlTheme>
         </TreeView.ItemContainerTheme>
-
       </TreeView>
-
     </Grid>
-    <Border IsVisible="{Binding IsLoading}" Background="#40000000">
-      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading</TextBlock>
-    </Border>
-  </Grid>
 
+    <controls:LoadingIndicator IsLoading="{Binding IsLoading}"/>    
+  </Grid>
 </UserControl>

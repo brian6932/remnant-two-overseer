@@ -78,7 +78,9 @@ public partial class MissingItemsViewModel : ViewModelBase
         {
             characterIndex = dataset.ActiveCharacterIndex;
             // Call private field to avoid filtering on every assignment
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             _filterText = null;
+#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             OnPropertyChanged(nameof(FilterText));
         }
 

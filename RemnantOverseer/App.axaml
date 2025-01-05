@@ -16,9 +16,11 @@
         <ResourceInclude Source="/Styles/BaseResources.axaml" />
         <ResourceInclude Source="/Styles/IconResources.axaml" />
         
+        <ResourceInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml" />
+        
         <!-- Why? -->
         <!-- https://github.com/AvaloniaUI/Avalonia.Samples/blob/main/src/Avalonia.Samples/CustomControls/RatingControlSample/App.axaml -->
-        <ResourceInclude Source="/Controls/LocationCard.axaml"/>
+        <ResourceInclude Source="/Controls/LoadingIndicator.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
 
