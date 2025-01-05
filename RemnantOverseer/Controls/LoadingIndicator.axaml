@@ -23,7 +23,7 @@
           <Border.Styles>
             <Style Selector="Border#LoadingContainer">
               <!-- If Background is not null, border acts as a hitstop even with 0 opacity -->
-              <Setter Property="Background" Value="" />
+              <Setter Property="Background" Value="{x:Null}" />
               <Setter Property="Opacity" Value="0"/>
             </Style>
           </Border.Styles>
