@@ -155,7 +155,7 @@
                     </StackPanel>
                   </Panel>
                 </Grid>
-->
+
                 <Separator Grid.Row="1" Height="2" BorderBrush="{StaticResource InnerBorderBrush}" Background="{StaticResource InnerBorderBrush}" />
 
                 <!-- Info -->
