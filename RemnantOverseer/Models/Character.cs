@@ -13,5 +13,5 @@ public class Character
     public TimeSpan Playtime { get; set; }
     public WorldTypes ActiveWorld { get; set; }
 
-    public string? FormattedPlaytime => (int)Playtime.TotalHours + Playtime.ToString(@"\:mm\:ss");// string.Format("{0}:{1}:{2}", (int)Playtime.TotalHours, Playtime.Minutes, Playtime.Seconds);
+    public string? FormattedPlaytime => (int)Playtime.TotalHours + Playtime.ToString(@"\:mm\:ss");
 }

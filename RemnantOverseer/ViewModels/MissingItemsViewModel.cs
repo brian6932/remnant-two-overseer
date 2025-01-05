@@ -18,7 +18,7 @@ public partial class MissingItemsViewModel : ViewModelBase
 {
     private readonly SaveDataService _saveDataService;
     private MappedMissingItems _mappedMissingItems = new();
-    private Subject<string?> _filterTextSubject = new Subject<string?>();
+    private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
     [ObservableProperty]
     private bool _isLoading = false;
@@ -59,7 +59,6 @@ public partial class MissingItemsViewModel : ViewModelBase
     [RelayCommand]
     public void ResetFilters()
     {
-        if (FilterText == null) ApplyFilter(); // to avoid filtering twice
         FilterText = null;
     }
 

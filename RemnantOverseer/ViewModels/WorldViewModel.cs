@@ -1,8 +1,6 @@
-﻿using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Newtonsoft.Json.Linq;
 using RemnantOverseer.Models;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
@@ -29,6 +27,29 @@ public partial class WorldViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLoading = false;
 
+    [ObservableProperty]
+    private bool _isCampaignSelected = true; // TODO: add disabling when no adventure
+
+    [ObservableProperty]
+    private bool _isGlobalExpandOn = true;
+
+    [ObservableProperty]
+    private bool _hideDuplicates = true;
+
+    [ObservableProperty]
+    private bool _isNerudFilterChecked = false;
+
+    [ObservableProperty]
+    private bool _isYaeshaFilterChecked = false;
+
+    [ObservableProperty]
+    private bool _isLosomnFilterChecked = false;
+
+    [ObservableProperty]
+    private string? _filterText = null;
+
+    private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
+
     public WorldViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
@@ -37,23 +58,7 @@ public partial class WorldViewModel : ViewModelBase
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
-
-        //IsActive = true; // Activate messenger on the first load
     }
-
-    [ObservableProperty]
-    private bool _isCampaignSelected = true; // TODO: add disabling when no adventure
-
-    // What?
-    // https://devblogs.microsoft.com/ifdef-windows/announcing-net-community-toolkit-v8-0-0-preview-3/#partial-property-changed-methods
-    partial void OnIsCampaignSelectedChanged(bool value)
-    {
-        // ResetLocationToggles();
-        ApplyFilter();
-    }
-
-    [ObservableProperty]
-    private bool _isGlobalExpandOn = true;
 
     [RelayCommand]
     private void ExpandTreeNodes()
@@ -61,19 +66,28 @@ public partial class WorldViewModel : ViewModelBase
         IsGlobalExpandOn = !IsGlobalExpandOn;
     }
 
-    // TODO: add to settings
-    [ObservableProperty]
-    private bool _hideDuplicates = true;
+    #region Filtering
+    // What?
+    // https://devblogs.microsoft.com/ifdef-windows/announcing-net-community-toolkit-v8-0-0-preview-3/#partial-property-changed-methods
+    partial void OnIsCampaignSelectedChanged(bool value)
+    {
+        ApplyFilter();
+    }
 
     partial void OnHideDuplicatesChanged(bool value)
     {
         ApplyFilter();
     }
 
-    #region Filtering
+    partial void OnFilterTextChanged(string? value)
+    {
+        _filterTextSubject.OnNext(value);
+    }
 
-    [ObservableProperty]
-    private bool _isNerudFilterChecked = false;
+    private void OnFilterTextChangedDebounced(string? value)
+    {
+        ApplyFilter(value);
+    }
 
     [RelayCommand]
     public void NerudFilterToggled()
@@ -86,9 +100,6 @@ public partial class WorldViewModel : ViewModelBase
         ApplyFilter();
     }
 
-    [ObservableProperty]
-    private bool _isYaeshaFilterChecked = false;
-
     [RelayCommand]
     public void YaeshaFilterToggled()
     {
@@ -99,9 +110,6 @@ public partial class WorldViewModel : ViewModelBase
         }
         ApplyFilter();
     }
-
-    [ObservableProperty]
-    private bool _isLosomnFilterChecked = false;
 
     [RelayCommand]
     public void LosomnFilterToggled()
@@ -118,23 +126,8 @@ public partial class WorldViewModel : ViewModelBase
     public void ResetFilters()
     {
         ResetLocationToggles();
-        if (FilterText == null) ApplyFilter(); // to avoid filtering twice
+        if (FilterText == null) ApplyFilter(); // If there is no filtertext but toggles were set, still need to filter
         FilterText = null;
-    }
-
-    [ObservableProperty]
-    private string? _filterText = null;
-
-    private Subject<string?> _filterTextSubject = new Subject<string?>();
-
-    partial void OnFilterTextChanged(string? value)
-    {
-        _filterTextSubject.OnNext(value);
-        //ApplyFilter(value);
-    }
-    private void OnFilterTextChangedDebounced(string? value)
-    {
-        ApplyFilter(value);
     }
 
     private void ApplyFilter()
@@ -144,9 +137,6 @@ public partial class WorldViewModel : ViewModelBase
 
     private void ApplyFilter(string? value)
     {
-        //optimization, not compatible with hide dupes
-        //if (string.IsNullOrEmpty(value)) { FilteredZones = Zones; return; }
-
         var tempZones = IsCampaignSelected ? _mappedZones.CampaignZoneList : _mappedZones.AdventureZoneList;
         var tempFilteredZones = new List<Zone>();
         foreach (var zone in tempZones)
@@ -159,12 +149,12 @@ public partial class WorldViewModel : ViewModelBase
                 if (IsLosomnFilterChecked && zone.Name != LocationStrings.Losomn) continue;
             }
 
-            var tempZone = zone.ShallowCopy(); // new Zone() { Name = zone.Name, Locations = [] };
+            var tempZone = zone.ShallowCopy();
             tempZone.Locations = [];
 
             foreach (var location in zone.Locations)
             {
-                var tempLocation = location.ShallowCopy(); // new Location() { Name = location.Name, Items = [] };
+                var tempLocation = location.ShallowCopy();
                 tempLocation.Items = [];
 
                 // Add more processing if necessary. Remove special characters?
@@ -190,7 +180,6 @@ public partial class WorldViewModel : ViewModelBase
     }
     #endregion Filtering
 
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
     private async Task ReadSave(int characterIndex, bool isCharacterCountChanged = false)
     {
         IsLoading = true;
@@ -202,6 +191,7 @@ public partial class WorldViewModel : ViewModelBase
             return;
         }
 
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
         if (isCharacterCountChanged)
         {
             characterIndex = dataset.ActiveCharacterIndex;
@@ -222,12 +212,12 @@ public partial class WorldViewModel : ViewModelBase
             _isCampaignSelected = false;
             OnPropertyChanged(nameof(IsCampaignSelected));
         }
+#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
         ApplyFilter();
 
         IsLoading = false;
     }
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
     private void ResetLocationToggles()
     {

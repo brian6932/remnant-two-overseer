@@ -39,25 +39,6 @@ public class SaveDataService
         WeakReferenceMessenger.Default.Register<SaveFilePathChangedMessage>(this, async (r, m) => await SaveFilePathChangedMessageHandler(m));
     }
 
-    //public async Task<string[]> GetProfileSummaries()
-    //{
-    //    if (FilePath is null) return [];
-
-    //    await _semaphore.WaitAsync();
-    //    try
-    //    {
-    //        if (_profileSummaries == null)
-    //        {
-    //            _profileSummaries = await Task.Run(() => Analyzer.GetProfileStrings(FilePath));
-    //        }
-    //    }
-    //    finally
-    //    {
-    //        _semaphore.Release();
-    //    }
-    //    return _profileSummaries;
-    //}
-
     public async Task<Dataset?> GetSaveData()
     {
         if (FilePath is null) return null;
@@ -131,14 +112,14 @@ public class SaveDataService
         WeakReferenceMessenger.Default.Send(new SaveFileChangedMessage(true));
     }
 
-    // TODO: Remove
-    public async Task ExportAsJson()
+    #region For debug only
+    internal async Task ExportAsJson()
     {
         if (FilePath is null) throw new ArgumentNullException("File path not set");
         await Task.Run(() => Exporter.Export(FilePath!, FilePath, false, false, true));
     }
 
-    public void ParseSave()
+    internal void ParseSave()
     {
         if (FilePath is null) throw new ArgumentNullException("File path not set");
 
@@ -148,4 +129,5 @@ public class SaveDataService
         var data = lib.remnant2.analyzer.Analyzer.Analyze(FilePath);
         Debug.WriteLine(data);
     }
+    #endregion
 }

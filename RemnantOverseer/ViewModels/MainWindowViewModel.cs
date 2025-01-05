@@ -33,10 +33,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _settingsService = settingsService;
         _saveDataService = saveDataService;
-        //if (_settingsService.Get().LastViewedCharacter == null)
-        //{
-        //    SwitchToCharacterView();
-        //}
         SwitchToWorldView();
         IsActive = true; // Turn on the messenger https://github.com/CommunityToolkit/MVVM-Samples/issues/37
         _saveDataService.StartWatching();
@@ -82,7 +78,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             SwitchToWorldViewCommand.Execute(null);
         });
 
-        // TODO
+        // TODO: Do I want to switch views automatically?
         Messenger.Register<MainWindowViewModel, SaveFileChangedMessage>(this, (r, m) => {
             ;
         });

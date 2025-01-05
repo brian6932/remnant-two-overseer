@@ -1,28 +1,31 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using RemnantOverseer.Models;
 using RemnantOverseer.Models.Enums;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RemnantOverseer.ViewModels;
 public partial class CharacterSelectViewModel: ViewModelBase
 {
     private readonly SaveDataService _saveDataService;
-    private readonly SettingsService _settingsService;
 
-    public CharacterSelectViewModel(SaveDataService saveDataService, SettingsService settingsService)
+    [ObservableProperty]
+    private List<Character> _characters = [];
+
+    [ObservableProperty]
+    private int _selectedCharacterIndex = -1; // Have to be set or else list will not update the binding
+
+    [ObservableProperty]
+    private bool _isLoading = false;
+
+    public CharacterSelectViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        _settingsService = settingsService;
 
         if(Design.IsDesignMode)
         {
@@ -39,42 +42,20 @@ public partial class CharacterSelectViewModel: ViewModelBase
         Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
     }
 
-    [ObservableProperty]
-    private List<Character> _characters = [];
-
-    //[ObservableProperty]
-    //private Character? _activeCharacter = null;
-
-    [ObservableProperty]
-    private int _selectedCharacterIndex = -1; // Have to be set or else list will not update the binding
-
     partial void OnSelectedCharacterIndexChanged(int value)
     {
-        Task.Run(async () => { 
+        Task.Run(async () => {
+            // Feeling TOO snappy without a delay. Look into making it feel better later
             await Task.Delay(125);
             Messenger.Send(new CharacterSelectChangedMessage(value));
         });
     }
 
-    [ObservableProperty]
-    private bool _isLoading = false;
-    
-    // consider using new handler
-    //partial void OnActiveCharacterChanged(Character? value)
-    //{
-    //    // Technically overwrites save the first time character is set from it with the same value. Look into it when free time exists
-    //    if (value != null)
-    //    {
-    //        // Feeling TOO snappy without a delay. Also need to figure out how to call this only on pointer release instead of on pointer down
-    //        Task.Run(async () => { await Task.Delay(125); Messenger.Send(new CharacterSelectChangedMessage(value)); });
-    //    }
-    //}
-
     private async Task ReadSave(bool setActiveCahracter)
     {
         IsLoading = true;
 
-        var data = await _saveDataService.GetSaveData(); //await _saveDataService.GetProfileSummaries();
+        var data = await _saveDataService.GetSaveData();
         if (data != null && data.Characters.Count > 0)
         {
             var mappedCharacters = DatasetMapper.MapCharacters(data.Characters).CharacterList;
@@ -84,12 +65,10 @@ public partial class CharacterSelectViewModel: ViewModelBase
 #endif
             Characters = mappedCharacters;
 
-            // TODO? Ensure this is only called on save load
             if (setActiveCahracter)
             {
                 // Calling directly will switch to worldview
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-                //_activeCharacter = mappedCharacters[data.ActiveCharacterIndex];
                 _selectedCharacterIndex = data.ActiveCharacterIndex;
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
                 OnPropertyChanged(nameof(SelectedCharacterIndex));
