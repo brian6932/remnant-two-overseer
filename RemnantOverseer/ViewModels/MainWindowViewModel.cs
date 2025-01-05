@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls.Notifications;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using RemnantOverseer.Models.Messages;
@@ -26,6 +27,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private bool _isSettingsViewSelected;
+
+    public WindowNotificationManager? NotificationManager { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. (Is set in SwitchToWorldView)
     public MainWindowViewModel(SettingsService settingsService, SaveDataService saveDataService)
@@ -81,6 +84,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // TODO: Do I want to switch views automatically?
         Messenger.Register<MainWindowViewModel, SaveFileChangedMessage>(this, (r, m) => {
             ;
+        });
+
+        Messenger.Register<MainWindowViewModel, NotificationErrorMessage>(this, (r, m) => {
+            NotificationManager?.Show(new Notification("Error", m.Value, NotificationType.Error));
+        });
+
+        Messenger.Register<MainWindowViewModel, NotificationWarningMessage>(this, (r, m) => {
+            NotificationManager?.Show(new Notification("Warning", m.Value, NotificationType.Warning));
+        });
+
+        Messenger.Register<MainWindowViewModel, NotificationInfoMessage>(this, (r, m) => {
+            NotificationManager?.Show(new Notification("Information", m.Value, NotificationType.Information));
         });
     }
 

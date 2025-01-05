@@ -10,5 +10,12 @@
   <!--<Color x:Key="BaseTextDisabledColor">#FF999999</Color>-->
   <Color x:Key="BaseTextDisabledColor">#FF7A7A7A</Color>
   <Color x:Key="ZoneTransitionColor">#FFcfa050</Color>
-
+  
+  <!-- Notifications (not using these color for now, using default theme) -->
+  <Color x:Key="NotificationInfoColor">#FF154779</Color>
+  <!-- Same as accent -->
+  <Color x:Key="NotificationErrorColor">#FF791515</Color>
+  <!-- Same as zone transition -->
+  <Color x:Key="NotificationWarningColor">#FFCFA050</Color>
+  <Color x:Key="NotificationNeutralColor">#FF2B2B2B</Color>
 </ResourceDictionary>
