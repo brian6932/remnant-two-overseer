@@ -16,6 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Remove="Assets\.github\**" />
+    <AvaloniaXaml Remove="Assets\.github\**" />
+    <Compile Remove="Assets\.github\**" />
+    <EmbeddedResource Remove="Assets\.github\**" />
+    <None Remove="Assets\.github\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />

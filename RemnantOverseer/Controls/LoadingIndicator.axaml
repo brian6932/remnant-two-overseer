@@ -13,6 +13,8 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Border Name="LoadingContainer" Classes.loading="{TemplateBinding IsLoading}" Background="#CC000000" Padding="16">
+          <!-- What? -->
+          <!-- https://stackoverflow.com/questions/77198873/datatrigger-to-start-animation-in-avalonia-ui -->
           <Border.Transitions>
             <Transitions>
               <DoubleTransition Property="Opacity" Duration="0:0:1"/>
