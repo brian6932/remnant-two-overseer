@@ -9,6 +9,7 @@
     
     <!-- https://stackoverflow.com/questions/20342061/disable-dll-culture-folders-on-compile -->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationIcon>Assets\IconShadow.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +22,10 @@
     <Compile Remove="Assets\.github\**" />
     <EmbeddedResource Remove="Assets\.github\**" />
     <None Remove="Assets\.github\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\IconShadow.ico" />
   </ItemGroup>
 
   <ItemGroup>
