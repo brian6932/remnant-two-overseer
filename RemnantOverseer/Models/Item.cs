@@ -27,7 +27,8 @@ public class Item
             OriginType switch
             {
                 // Extra spaces are a temporary workaround to https://github.com/AvaloniaUI/Avalonia/issues/17862, remove when fixed
-                OriginTypes.Injectable or OriginTypes.Dungeon or OriginTypes.Vendor => $" {OriginType}: {OriginName} ",
+                // It's not fixed yet, but I moved this text out of the tooltip. Removing spaces, keeping comment
+                OriginTypes.Injectable or OriginTypes.Dungeon or OriginTypes.Vendor => $"{OriginType}: {OriginName}",
                 _ => null
             };
         }
