@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using RemnantOverseer.Utilities;
 using RemnantOverseer.ViewModels;
-using System;
 
 namespace RemnantOverseer.Views;
 public partial class MainWindow : Window

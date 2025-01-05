@@ -12,7 +12,7 @@
   <ControlTheme x:Key="{x:Type controls:LoadingIndicator}" TargetType="controls:LoadingIndicator">
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Name="LoadingContainer" Classes.loading="{TemplateBinding IsLoading}" Background="#CC000000" Padding="16" IsVisible="{TemplateBinding IsLoading}">
+        <Border Name="LoadingContainer" Classes.loading="{TemplateBinding IsLoading}" Padding="16">
           <!-- What? -->
           <!-- https://stackoverflow.com/questions/77198873/datatrigger-to-start-animation-in-avalonia-ui -->
           <Border.Transitions>
@@ -22,13 +22,14 @@
           </Border.Transitions>
           <Border.Styles>
             <Style Selector="Border#LoadingContainer">
-              <Setter Property="IsHitTestVisible" Value="False"/>
+              <!-- If Background is not null, border acts as a hitstop even with 0 opacity -->
+              <Setter Property="Background" Value="" />
               <Setter Property="Opacity" Value="0"/>
             </Style>
           </Border.Styles>
           <Border.Styles>
             <Style Selector="Border#LoadingContainer.loading">
-              <Setter Property="IsHitTestVisible" Value="True"/>
+              <Setter Property="Background" Value="#CC000000" />
               <Setter Property="Opacity" Value="1"/>
             </Style>
           </Border.Styles>
