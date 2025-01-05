@@ -222,9 +222,7 @@
           </TreeView.ItemContainerTheme>
 
         </TreeView>
-
       </Grid>
-
     <controls:LoadingIndicator IsLoading="{Binding IsLoading}"/>
   </Grid>
 </UserControl>

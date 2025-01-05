@@ -1,5 +1,8 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Messaging;
 using lib.remnant2.analyzer;
+using RemnantOverseer.Models.Messages;
+using RemnantOverseer.Utilities;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -9,24 +12,27 @@ public class SettingsService
 {
     private readonly object _lock = new object();
     private readonly string path = Path.Combine(AppContext.BaseDirectory, "settings.json");
-    private Settings _settings;
+    private Settings _settings = new();
     private JsonSerializerOptions _options = new() { WriteIndented = true };
 
     public SettingsService()
     {
-        _settings = new Settings();
-
         // XAML Designer support
         if (Design.IsDesignMode)
         {
-            return;
-        }
+            return; // TODO?
+        }        
+    }
 
+    public void Initialize()
+    {
         if (File.Exists(path))
         {
+            // Considering making a toast for this and remaking the file. But I think crashing is more educational
             string json = File.ReadAllText(path);
             _settings = JsonSerializer.Deserialize<Settings>(json)!;
         }
+
         if (_settings.SaveFilePath == null)
         {
             // Try to get a path
@@ -37,10 +43,10 @@ public class SettingsService
             }
             catch
             {
-                // TODO: send a message that auto detect failed
+                WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(NotificationStrings.DefaultLocationNotFound));
             }
 
-            // TODO: send a toast message that we tried to get the path?
+            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
         }
     }
 

@@ -109,6 +109,12 @@
       
       <!-- Content -->
       <ContentControl Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding ContentViewModel}"></ContentControl>
+      <Border Grid.Column="2" IsVisible="{Binding !CanDisplayContent}" Background="{StaticResource GlobalBackroundBrush}">
+        <TextBlock FontSize="18" xml:space="preserve" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center">
+        It looks like we've encountered an error.
+        Make sure that settings are accurate and restart the application
+      </TextBlock>
+      </Border>
     </Grid>
   </Grid>
 

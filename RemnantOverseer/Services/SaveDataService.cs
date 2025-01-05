@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
+using RemnantOverseer.Utilities;
 
 namespace RemnantOverseer.Services;
 public class SaveDataService
@@ -52,10 +53,19 @@ public class SaveDataService
                 _dataset = await Task.Run(() => Analyzer.Analyze(FilePath));
             }
         }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new NotificationErrorMessage($"{NotificationStrings.SaveFileParsingError}{Environment.NewLine}{ex.Message}"));
+        }
         finally
         {
             _semaphore.Release();
         }
+
+        if (_dataset == null)
+            WeakReferenceMessenger.Default.Send(new DatasetIsNullMessage());
+        else
+            WeakReferenceMessenger.Default.Send(new DatasetParsedMessage());
         return _dataset;
     }
 
@@ -75,8 +85,8 @@ public class SaveDataService
         else
         {
             FileWatcher.EnableRaisingEvents = false;
+            WeakReferenceMessenger.Default.Send(new NotificationErrorMessage(NotificationStrings.FileWatcherFolderNotFound));
             return false;
-            // TODO: throw new ArgumentException($"Target directory [{FilePath}] doesn't exist");
         }
     }
     public void PauseWatching()

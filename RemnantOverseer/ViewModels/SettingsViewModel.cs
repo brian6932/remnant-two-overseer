@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
+using RemnantOverseer.Utilities;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,6 +56,7 @@ public partial class SettingsViewModel: ViewModelBase
                 _settingsService.Update(settings);
                 FilePath = newPath;
                 WeakReferenceMessenger.Default.Send(new SaveFilePathChangedMessage(FilePath!));
+                WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.SaveFileLocationChanged));
             }
         }
     }

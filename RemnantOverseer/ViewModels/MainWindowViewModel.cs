@@ -14,6 +14,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly SaveDataService _saveDataService;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanDisplayContent))]
     private ViewModelBase _contentViewModel;
 
     [ObservableProperty]
@@ -28,6 +29,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool _isSettingsViewSelected;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanDisplayContent))]
+    private bool _isInErrorState = false;
+
+    public bool CanDisplayContent => !IsInErrorState || ContentViewModel is SettingsViewModel;
+
     public WindowNotificationManager? NotificationManager { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. (Is set in SwitchToWorldView)
@@ -36,9 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _settingsService = settingsService;
         _saveDataService = saveDataService;
-        SwitchToWorldView();
         IsActive = true; // Turn on the messenger https://github.com/CommunityToolkit/MVVM-Samples/issues/37
-        _saveDataService.StartWatching();
     }
 
     [RelayCommand]
@@ -73,6 +78,15 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         IsSettingsViewSelected = true;
     }
 
+    // This was moved out of the ctor to support early messages from the settings service
+    // Otherwise everything inits before notification manager gets attached
+    public void OnLoaded()
+    {
+        _settingsService.Initialize();
+        SwitchToWorldView();
+        _saveDataService.StartWatching();
+    }
+
     #region Messages
     protected override void OnActivated()
     {
@@ -84,6 +98,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // TODO: Do I want to switch views automatically?
         Messenger.Register<MainWindowViewModel, SaveFileChangedMessage>(this, (r, m) => {
             ;
+        });
+
+        Messenger.Register<MainWindowViewModel, DatasetIsNullMessage>(this, (r, m) => {
+            IsInErrorState = true;
+        });
+
+        Messenger.Register<MainWindowViewModel, DatasetParsedMessage>(this, (r, m) => {
+            IsInErrorState = false;
         });
 
         Messenger.Register<MainWindowViewModel, NotificationErrorMessage>(this, (r, m) => {
