@@ -89,19 +89,19 @@
           </Style>
         </Grid.Styles>
         <TextBlock Grid.Column="0" Text="[" Margin="20 0 5 0"/>
-        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}}">
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}">
           <Ellipse.RenderTransform>
             <RotateTransform Angle="45" />
           </Ellipse.RenderTransform>
         </Ellipse>
         <!-- I think this is the easiest way to go about it honestly (single archetype support) -->
-        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}}"
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}"
                  IsVisible="{Binding SelectedCharacter.SubArchetype, Converter={x:Static ObjectConverters.IsNull}}">
           <Ellipse.RenderTransform>
             <RotateTransform Angle="225" />
           </Ellipse.RenderTransform>
         </Ellipse>
-        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.SubArchetype, Converter={StaticResource ArchetypeToBackgroundConverter}}">
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.SubArchetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}">
           <Ellipse.RenderTransform>
             <RotateTransform Angle="225" />
           </Ellipse.RenderTransform>

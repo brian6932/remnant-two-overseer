@@ -16,7 +16,26 @@ public class ArchetypeToBackgroundConverter: IValueConverter
         }
         else
         {
-            return new SolidColorBrush(Color.Parse(ArchetypeColors.Map[(Archetypes)value]));
+            // What?
+            // https://stackoverflow.com/a/13532993/8362950
+            var color = Color.Parse(ArchetypeColors.Map[(Archetypes)value]);
+            if (parameter is string percent && !string.IsNullOrEmpty(percent))
+            {
+                var percentNum = int.Parse(percent); 
+                if (percentNum > 100 || percentNum < -100)
+                    return AvaloniaProperty.UnsetValue;
+
+                var r = color.R * (100 + percentNum) / 100;
+                var g = color.G * (100 + percentNum) / 100;
+                var b = color.B * (100 + percentNum) / 100;
+
+                r = r < 255 ? r : 255;
+                g = g < 255 ? g : 255;
+                b = b < 255 ? b : 255;
+
+                color = new Color(color.A, (byte)r, (byte)g, (byte)b);
+            }
+            return new SolidColorBrush(color);
         }
     }
 
