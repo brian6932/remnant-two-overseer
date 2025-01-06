@@ -33,3 +33,6 @@ This tool only **reads** the save file, it can not make any changes to it.
 - AndrewSav for [https://github.com/AndrewSav/lib.remnant2.analyzer](https://github.com/AndrewSav/lib.remnant2.analyzer), which is used as an underlying parsing library
 - Avalonia (EN) telegram channel and specifically Steve for answering many of my AvaloniaUI-related questions
 - And you! For taking an interest in the project
+
+# Known issues
+- When viewing a big list of items application is stuttering on refresh. This is due to my control of choice (treeview) not having virtualization, so building a visual tree takes a while. I learned about this quite late in development, so I decided to stick with it for now. I will try to optimize it when I have extra time (this will require a non-trivial rework)
