@@ -21,6 +21,8 @@ public partial class WorldViewModel : ViewModelBase
 
     private MappedZones _mappedZones = new();
 
+    private int _selectedCharacterIndex = -1;
+
     [ObservableProperty]
     private ObservableCollection<Zone> _filteredZones = [];
 
@@ -53,7 +55,7 @@ public partial class WorldViewModel : ViewModelBase
     public WorldViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(0, true); this.IsActive = true; });
+        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
 
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
@@ -180,7 +182,9 @@ public partial class WorldViewModel : ViewModelBase
     }
     #endregion Filtering
 
-    private async Task ReadSave(int characterIndex, bool isCharacterCountChanged = false)
+    // TODO: Look into skipping updates if character index doesn't match and reset is false?
+    // Need to think about it, feel like it's a bad idea
+    private async Task ReadSave(bool resetActiveCahracter = false)
     {
         IsLoading = true;
 
@@ -192,17 +196,17 @@ public partial class WorldViewModel : ViewModelBase
         }
 
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-        if (isCharacterCountChanged)
+        if (resetActiveCahracter)
         {
-            characterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
             ResetLocationToggles();
             _filterText = null;
             OnPropertyChanged(nameof(FilterText));
         }
 
-        _mappedZones = DatasetMapper.MapCharacterToZones(dataset.Characters[characterIndex]);
+        _mappedZones = DatasetMapper.MapCharacterToZones(dataset.Characters[_selectedCharacterIndex]);
         // Call private field to avoid filtering on every assignment
-        if (dataset.Characters[characterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
+        if (dataset.Characters[_selectedCharacterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
         {
             _isCampaignSelected = true;
             OnPropertyChanged(nameof(IsCampaignSelected));
@@ -219,6 +223,12 @@ public partial class WorldViewModel : ViewModelBase
         IsLoading = false;
     }
 
+    private async Task CharacterUpdatedHandler(int characerIndex)
+    {
+        _selectedCharacterIndex = characerIndex;
+        await ReadSave(false);
+    }
+
     private void ResetLocationToggles()
     {
         IsNerudFilterChecked = false;
@@ -231,12 +241,12 @@ public partial class WorldViewModel : ViewModelBase
     {
         Messenger.Register<WorldViewModel, CharacterSelectChangedMessage>(this, (r, m) => {
             IsLoading = true; // Look into it later, sometimes task starts just a moment too late and the old stuff still can be seen
-            Task.Run(async () => await ReadSave(m.Value));
+            Task.Run(async () => await CharacterUpdatedHandler(m.Value));
         });
 
         Messenger.Register<WorldViewModel, SaveFileChangedMessage>(this, (r, m) => {
             IsLoading = true;
-            Task.Run(async () => await ReadSave(0, m.CharacterCountChanged));
+            Task.Run(async () => await ReadSave(m.CharacterCountChanged));
         });
     }
     #endregion Messages

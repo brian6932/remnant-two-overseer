@@ -20,6 +20,8 @@ public partial class MissingItemsViewModel : ViewModelBase
     private MappedMissingItems _mappedMissingItems = new();
     private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
+    private int _selectedCharacterIndex = -1;
+
     [ObservableProperty]
     private bool _isLoading = false;
 
@@ -35,7 +37,7 @@ public partial class MissingItemsViewModel : ViewModelBase
     public MissingItemsViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(0, true); this.IsActive = true; });
+        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
@@ -62,7 +64,7 @@ public partial class MissingItemsViewModel : ViewModelBase
         FilterText = null;
     }
 
-    private async Task ReadSave(int characterIndex, bool isCharacterCountChanged = false)
+    private async Task ReadSave(bool resetActiveCahracter = false)
     {
         IsLoading = true;
 
@@ -73,9 +75,9 @@ public partial class MissingItemsViewModel : ViewModelBase
             return;
         }
 
-        if (isCharacterCountChanged)
+        if (resetActiveCahracter)
         {
-            characterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
             // Call private field to avoid filtering on every assignment
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             _filterText = null;
@@ -83,11 +85,17 @@ public partial class MissingItemsViewModel : ViewModelBase
             OnPropertyChanged(nameof(FilterText));
         }
 
-        _mappedMissingItems = DatasetMapper.MapMissingItems(dataset.Characters[characterIndex].Profile.MissingItems);
+        _mappedMissingItems = DatasetMapper.MapMissingItems(dataset.Characters[_selectedCharacterIndex].Profile.MissingItems);
 
         ApplyFilter();
 
         IsLoading = false;
+    }
+
+    private async Task CharacterUpdatedHandler(int characerIndex)
+    {
+        _selectedCharacterIndex = characerIndex;
+        await ReadSave(false);
     }
 
     private void ApplyFilter()
@@ -124,12 +132,12 @@ public partial class MissingItemsViewModel : ViewModelBase
     {
         Messenger.Register<MissingItemsViewModel, CharacterSelectChangedMessage>(this, (r, m) => {
             IsLoading = true; // Look into it later, sometimes task starts just a moment too late and the old stuff still can be seen
-            Task.Run(async () => await ReadSave(m.Value));
+            Task.Run(async () => await CharacterUpdatedHandler(m.Value));
         });
 
         Messenger.Register<MissingItemsViewModel, SaveFileChangedMessage>(this, (r, m) => {
             IsLoading = true;
-            Task.Run(async () => await ReadSave(0, m.CharacterCountChanged));
+            Task.Run(async () => await ReadSave(m.CharacterCountChanged));
         });
     }
     #endregion Messages

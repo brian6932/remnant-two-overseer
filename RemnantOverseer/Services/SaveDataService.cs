@@ -51,6 +51,7 @@ public class SaveDataService
             if (_dataset == null)
             {
                 _dataset = await Task.Run(() => Analyzer.Analyze(FilePath));
+                _lastCharacterCount = _dataset.Characters.Count;
             }
         }
         catch (Exception ex)

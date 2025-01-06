@@ -15,14 +15,10 @@ public partial class CharacterSelectViewModel: ViewModelBase
 {
     private readonly SaveDataService _saveDataService;
 
+    private int _selectedCharacterIndex = -1;
+
     [ObservableProperty]
     private List<Character> _characters = [];
-
-    [ObservableProperty]
-    private int _selectedCharacterIndex = -1; // Have to be set or else list will not update the binding
-
-    //[ObservableProperty]
-    //private Character _selectedCharacter;
 
     [ObservableProperty]
     private bool _isLoading = false;
@@ -46,47 +42,25 @@ public partial class CharacterSelectViewModel: ViewModelBase
         Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
     }
 
-    //partial void OnSelectedCharacterIndexChanged(int value)
-    //{
-    //    Task.Run(async () => {
-    //        // Feeling TOO snappy without a delay. Look into making it feel better later
-    //        await Task.Delay(125);
-    //        Messenger.Send(new CharacterSelectChangedMessage(value));
-    //    });
-    //}
-
-    //partial void OnSelectedCharacterChanged(Character? oldValue, Character newValue)
-    //{
-    //    if (newValue is null) return;
-
-    //    Task.Run(async () =>
-    //    {
-    //        // Feeling TOO snappy without a delay. Look into making it feel better later
-    //        await Task.Delay(125);
-    //        Messenger.Send(new CharacterSelectChangedMessage(newValue.Index));
-    //    });
-    //}
-
     [RelayCommand]
     public void CharacterSelected(Character selectedCharacter)
     {
-        // Could remove the SelectedCharacterIndex field cmopletely and simply compare to itself
-        if (selectedCharacter.Index == SelectedCharacterIndex) return;
+        if (selectedCharacter.Index == _selectedCharacterIndex) return;
 
         foreach (var character in Characters)
         {
             character.IsSelected = character.Index == selectedCharacter.Index;
         }
-        SelectedCharacterIndex = selectedCharacter.Index;
+        _selectedCharacterIndex = selectedCharacter.Index;
         Task.Run(async () =>
         {
-            // Feeling TOO snappy without a delay. Look into making it feel better later
+            // Feeling TOO snappy without a delay
             await Task.Delay(125);
-            Messenger.Send(new CharacterSelectChangedMessage(SelectedCharacterIndex));
+            Messenger.Send(new CharacterSelectChangedMessage(_selectedCharacterIndex));
         });
     }
 
-    private async Task ReadSave(bool setActiveCahracter)
+    private async Task ReadSave(bool resetActiveCahracter)
     {
         IsLoading = true;
 
@@ -98,25 +72,21 @@ public partial class CharacterSelectViewModel: ViewModelBase
             //mappedCharacters.Add(new Character() { ObjectCount = 0, Archetype = Archetypes.Unknown, Index = 2 });
             //mappedCharacters.Add(new Character() { ObjectCount = 10, Archetype = Archetypes.Invader, Index = 3, PowerLevel = 4, Playtime = TimeSpan.FromHours(10) });
 #endif
-
-            if (setActiveCahracter)
+            if (resetActiveCahracter)
             {
-                // Calling directly will switch to worldview
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
                 _selectedCharacterIndex = data.ActiveCharacterIndex;
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-                OnPropertyChanged(nameof(SelectedCharacterIndex));
-
-                //_selectedCharacter = Characters[data.ActiveCharacterIndex];
-                //OnPropertyChanged(nameof(SelectedCharacter));
             }
 
-            if (SelectedCharacterIndex >= 0)
+            if (_selectedCharacterIndex >= 0)
             {
                 foreach (var character in mappedCharacters)
                 {
-                    character.IsSelected = character.Index == SelectedCharacterIndex;
+                    character.IsSelected = character.Index == _selectedCharacterIndex;
                 }
+            }
+            else
+            {
+                Messenger.Send(new NotificationWarningMessage(NotificationStrings.SelectedCharacterNotValid));
             }
 
             Characters = mappedCharacters;
