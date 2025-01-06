@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia;
+using Avalonia.Data.Converters;
 using Avalonia.Media;
 using RemnantOverseer.Models.Enums;
 using System;
@@ -11,7 +12,7 @@ public class ArchetypeToBackgroundConverter: IValueConverter
     {
         if (value == null || value.GetType() != typeof(Archetypes))
         {
-            throw new ArgumentException("Unsupported");
+            return AvaloniaProperty.UnsetValue;
         }
         else
         {

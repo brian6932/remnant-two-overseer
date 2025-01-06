@@ -27,16 +27,7 @@ internal class DatasetMapper
         var result = new MappedCharacters();
         foreach (var character in characters)
         {
-            var mappedCharacter = new Models.Character();
-            mappedCharacter.Index = character.Index;
-            mappedCharacter.Archetype = Enum.Parse<Archetypes>(character.Profile.Archetype);
-            mappedCharacter.SubArchetype = Enum.Parse<Archetypes>(character.Profile.SecondaryArchetype);
-            mappedCharacter.ObjectCount = character.Profile.AcquiredItems;
-            mappedCharacter.PowerLevel = character.Profile.ItemLevel; // Yes.
-            mappedCharacter.ActiveWorld = Enum.Parse<WorldTypes>(character.ActiveWorldSlot.ToString(), true);
-            mappedCharacter.IsHardcore = character.Profile.IsHardcore;
-            mappedCharacter.Playtime = character.Save.Playtime ?? TimeSpan.Zero;
-
+            var mappedCharacter = MapCharacter(character);
             result.CharacterList.Add(mappedCharacter);
         }
 
@@ -44,6 +35,21 @@ internal class DatasetMapper
         result.CharacterList = [.. result.CharacterList.OrderBy((m) => m.Index)];
 
         return result;
+    }
+
+    public static Models.Character MapCharacter(Character character)
+    {
+        return new Models.Character
+        {
+            Index = character.Index,
+            Archetype = Enum.Parse<Archetypes>(character.Profile.Archetype),
+            SubArchetype = Enum.Parse<Archetypes>(character.Profile.SecondaryArchetype),
+            ObjectCount = character.Profile.AcquiredItems,
+            PowerLevel = character.Profile.ItemLevel, // Yes.
+            ActiveWorld = Enum.Parse<WorldTypes>(character.ActiveWorldSlot.ToString(), true),
+            IsHardcore = character.Profile.IsHardcore,
+            Playtime = character.Save.Playtime ?? TimeSpan.Zero
+        };
     }
 
     public static MappedMissingItems MapMissingItems(List<Dictionary<string, string>> missingItemsDict)

@@ -2,9 +2,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using RemnantOverseer.Models;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
+using RemnantOverseer.Utilities;
 using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace RemnantOverseer.ViewModels;
 
@@ -32,6 +36,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanDisplayContent))]
     private bool _isInErrorState = false;
+
+    [ObservableProperty]
+    private Character? _selectedCharacter;
 
     public bool CanDisplayContent => !IsInErrorState || ContentViewModel is SettingsViewModel;
 
@@ -83,6 +90,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void OnLoaded()
     {
         _settingsService.Initialize();
+        SaveFileUpdatedHandler(true);
         SwitchToWorldView();
         _saveDataService.StartWatching();
     }
@@ -92,12 +100,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         // This should be replaced by a navigator in the future
         Messenger.Register<MainWindowViewModel, CharacterSelectChangedMessage>(this, (r, m) => {
+            CharacterUpdatedHandler(m.Value);
             SwitchToWorldViewCommand.Execute(null);
         });
 
         // TODO: Do I want to switch views automatically?
         Messenger.Register<MainWindowViewModel, SaveFileChangedMessage>(this, (r, m) => {
-            ;
+            SaveFileUpdatedHandler(m.CharacterCountChanged);
         });
 
         Messenger.Register<MainWindowViewModel, DatasetIsNullMessage>(this, (r, m) => {
@@ -118,6 +127,35 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         Messenger.Register<MainWindowViewModel, NotificationInfoMessage>(this, (r, m) => {
             NotificationManager?.Show(new Notification("Information", m.Value, NotificationType.Information));
+        });
+    }
+
+    private void CharacterUpdatedHandler(int index)
+    {
+        Task.Run(async () =>
+        {
+            var ds = await _saveDataService.GetSaveData();
+            if (ds == null)
+            {
+                SelectedCharacter = null;
+                return;
+            }
+            SelectedCharacter = DatasetMapper.MapCharacter(ds.Characters[index]);
+        });
+    }
+
+    private void SaveFileUpdatedHandler(bool resetActiveCharacter)
+    {
+        Task.Run(async () =>
+        {
+            var ds = await _saveDataService.GetSaveData();
+            if (ds == null)
+            {
+                SelectedCharacter = null;
+                return;
+            }
+            var index = resetActiveCharacter ? ds.ActiveCharacterIndex : SelectedCharacter?.Index ?? 0;
+            SelectedCharacter = DatasetMapper.MapCharacter(ds.Characters[index]);
         });
     }
 
