@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using RemnantOverseer.Models;
 using RemnantOverseer.Models.Enums;
@@ -19,6 +20,9 @@ public partial class CharacterSelectViewModel: ViewModelBase
 
     [ObservableProperty]
     private int _selectedCharacterIndex = -1; // Have to be set or else list will not update the binding
+
+    //[ObservableProperty]
+    //private Character _selectedCharacter;
 
     [ObservableProperty]
     private bool _isLoading = false;
@@ -42,12 +46,43 @@ public partial class CharacterSelectViewModel: ViewModelBase
         Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
     }
 
-    partial void OnSelectedCharacterIndexChanged(int value)
+    //partial void OnSelectedCharacterIndexChanged(int value)
+    //{
+    //    Task.Run(async () => {
+    //        // Feeling TOO snappy without a delay. Look into making it feel better later
+    //        await Task.Delay(125);
+    //        Messenger.Send(new CharacterSelectChangedMessage(value));
+    //    });
+    //}
+
+    //partial void OnSelectedCharacterChanged(Character? oldValue, Character newValue)
+    //{
+    //    if (newValue is null) return;
+
+    //    Task.Run(async () =>
+    //    {
+    //        // Feeling TOO snappy without a delay. Look into making it feel better later
+    //        await Task.Delay(125);
+    //        Messenger.Send(new CharacterSelectChangedMessage(newValue.Index));
+    //    });
+    //}
+
+    [RelayCommand]
+    public void CharacterSelected(Character selectedCharacter)
     {
-        Task.Run(async () => {
+        // Could remove the SelectedCharacterIndex field cmopletely and simply compare to itself
+        if (selectedCharacter.Index == SelectedCharacterIndex) return;
+
+        foreach (var character in Characters)
+        {
+            character.IsSelected = character.Index == selectedCharacter.Index;
+        }
+        SelectedCharacterIndex = selectedCharacter.Index;
+        Task.Run(async () =>
+        {
             // Feeling TOO snappy without a delay. Look into making it feel better later
             await Task.Delay(125);
-            Messenger.Send(new CharacterSelectChangedMessage(value));
+            Messenger.Send(new CharacterSelectChangedMessage(SelectedCharacterIndex));
         });
     }
 
@@ -63,7 +98,6 @@ public partial class CharacterSelectViewModel: ViewModelBase
             //mappedCharacters.Add(new Character() { ObjectCount = 0, Archetype = Archetypes.Unknown, Index = 2 });
             //mappedCharacters.Add(new Character() { ObjectCount = 10, Archetype = Archetypes.Invader, Index = 3, PowerLevel = 4, Playtime = TimeSpan.FromHours(10) });
 #endif
-            Characters = mappedCharacters;
 
             if (setActiveCahracter)
             {
@@ -72,7 +106,20 @@ public partial class CharacterSelectViewModel: ViewModelBase
                 _selectedCharacterIndex = data.ActiveCharacterIndex;
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
                 OnPropertyChanged(nameof(SelectedCharacterIndex));
+
+                //_selectedCharacter = Characters[data.ActiveCharacterIndex];
+                //OnPropertyChanged(nameof(SelectedCharacter));
             }
+
+            if (SelectedCharacterIndex >= 0)
+            {
+                foreach (var character in mappedCharacters)
+                {
+                    character.IsSelected = character.Index == SelectedCharacterIndex;
+                }
+            }
+
+            Characters = mappedCharacters;
         }
         // TODO: Sometimes char screen is empty. I think this might be the cause.
         if (data is null)
