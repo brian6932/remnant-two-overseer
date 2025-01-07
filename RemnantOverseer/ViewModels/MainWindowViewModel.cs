@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -7,7 +8,6 @@ using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace RemnantOverseer.ViewModels;
@@ -93,6 +93,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         SaveFileUpdatedHandler(true);
         SwitchToWorldView();
         _saveDataService.StartWatching();
+
+        // Version check
+        Task.Run(async () =>
+        {
+            var nv = await VersionChecker.TryGetNewVersion();
+            if (nv is not null)
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    NotificationManager?.Show(new Notification("Information", string.Format(NotificationStrings.NewerVersionFound, nv), NotificationType.Information));
+                });
+        });
     }
 
     #region Messages
