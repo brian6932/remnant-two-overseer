@@ -44,6 +44,7 @@ public class SettingsService
             catch
             {
                 WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(NotificationStrings.DefaultLocationNotFound));
+                return;
             }
 
             WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));

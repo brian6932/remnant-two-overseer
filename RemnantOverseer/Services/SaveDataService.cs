@@ -42,7 +42,11 @@ public class SaveDataService
 
     public async Task<Dataset?> GetSaveData()
     {
-        if (FilePath is null) return null;
+        if (FilePath is null)
+        {
+            WeakReferenceMessenger.Default.Send(new DatasetIsNullMessage());
+            return null;
+        }
 
         // TODO: Add timeout?
         await _semaphore.WaitAsync();
@@ -77,6 +81,8 @@ public class SaveDataService
 
     public bool StartWatching()
     {
+        if (FilePath is null) return false;
+
         if (Directory.Exists(FilePath))
         {
             FileWatcher.Path = FilePath;
