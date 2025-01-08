@@ -36,3 +36,4 @@ This tool only **reads** the save file, it can not make any changes to it.
 
 # Known issues
 - When viewing a big list of items application is stuttering on refresh. This is due to my control of choice (treeview) not having virtualization, so building a visual tree takes a while. I learned about this quite late in development, so I decided to stick with it for now. I will try to optimize it when I have extra time (this will require a non-trivial rework)
+- Gamepass version is not supported for now. It looks like there are some differences in how files are saved between GP and Steam
