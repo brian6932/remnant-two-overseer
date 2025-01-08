@@ -94,6 +94,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         SwitchToWorldView();
         _saveDataService.StartWatching();
 
+#if DEBUG
+        // Avoid being rate limited by gh
+        return;
+#endif
         // Version check
         Task.Run(async () =>
         {
@@ -115,7 +119,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             SwitchToWorldViewCommand.Execute(null);
         });
 
-        // TODO: Do I want to switch views automatically?
         Messenger.Register<MainWindowViewModel, SaveFileChangedMessage>(this, (r, m) => {
             SaveFileUpdatedHandler(m.CharacterCountChanged);
         });
