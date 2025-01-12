@@ -182,7 +182,7 @@
                           IsEnabled="{Binding !IsLooted}"/>
 
                 <Grid Grid.Column="1" ColumnDefinitions="Auto, Auto">
-                  <HyperlinkButton Grid.Column="0" NavigateUri="{Binding WikiLink}" Margin="0" Padding="2" ToolTip.Placement="Bottom">
+                  <HyperlinkButton Grid.Column="0" NavigateUri="{Binding WikiLink}" Margin="0" Padding="2">
                     <!-- Remove default styling-->
                     <HyperlinkButton.Styles>
                       <Style Selector="HyperlinkButton">
@@ -224,9 +224,9 @@
                             </MultiBinding>
                           </TextBlock.IsVisible>
                         </TextBlock>
-                        <StackPanel Orientation="Horizontal">
-                          <PathIcon Height="20" Width="20" Margin="0 0 3 0" Data="{StaticResource RemnantWikiIcon}"/>
-                          <TextBlock TextDecorations="{x:Null}">Click to go to wiki</TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                          <PathIcon Height="16" Width="16" Margin="0 0 3 0" Data="{StaticResource RemnantWikiIcon}"/>
+                          <TextBlock FontSize="12" TextDecorations="{x:Null}">Click to go to wiki</TextBlock>
                         </StackPanel>
                       </StackPanel>
                     </ToolTip.Tip>
