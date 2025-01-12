@@ -155,6 +155,7 @@ internal class DatasetMapper
             Name = lootItem.Name,
             Description = lootItem.ItemNotes,
             IsLooted = lootItem.IsLooted,
+            IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
             Type = itemType,
             IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
         };
@@ -172,6 +173,7 @@ internal class DatasetMapper
             Name = lootItem.Name,
             Description = lootItem.ItemNotes,
             IsLooted = lootItem.IsLooted,
+            IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
             Type = itemType,
             OriginType = originType,
             OriginName = lootGroup.Name ?? string.Empty,

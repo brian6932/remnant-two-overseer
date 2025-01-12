@@ -11,6 +11,7 @@ public class Item
     public string OriginName { get; set; } = string.Empty;
     public bool IsDuplicate { get; set; }
     public bool IsLooted { get; set; }
+    public bool IsPrerequisiteMissing { get; set; }
     public bool IsCoop { get; set; }
 
     // We are only interested in a couple of types to display
@@ -28,6 +29,8 @@ public class Item
             };
         }
     }
+
+    public string? WikiLink => $"https://remnant.wiki/{Name}";
 
     public Item ShallowCopy()
     {

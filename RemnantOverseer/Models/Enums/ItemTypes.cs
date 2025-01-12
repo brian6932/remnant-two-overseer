@@ -8,6 +8,7 @@ public enum ItemTypes
     Consumable,
     Dream,
     Engram,
+    Material,
     Mod,
     Mutator,
     Prism,

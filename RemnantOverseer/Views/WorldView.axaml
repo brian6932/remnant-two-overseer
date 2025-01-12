@@ -180,16 +180,64 @@
                           Data="{Binding Type, Converter={StaticResource ItemTypeToIconConverter}}"
                           ToolTip.Tip="{Binding Type}"
                           IsEnabled="{Binding !IsLooted}"/>
-                
-                <TextBlock Grid.Column="1" Text="{Binding Name}"  IsEnabled="{Binding !IsLooted}"
-                           ToolTip.Tip="Can't be looted in the current world state. For example, if the quest has already been completed and an alternative reward was chosen"
-                           ToolTip.ServiceEnabled="{Binding IsLooted}" ToolTip.ShowOnDisabled="True" />
+
+                <Grid Grid.Column="1" ColumnDefinitions="Auto, Auto">
+                  <HyperlinkButton Grid.Column="0" NavigateUri="{Binding WikiLink}" Margin="0" Padding="2" ToolTip.Placement="Bottom">
+                    <!-- Remove default styling-->
+                    <HyperlinkButton.Styles>
+                      <Style Selector="HyperlinkButton">
+                      <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+                      <Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+                        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                          <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+                        </Style>
+                        <Style Selector="^:visited">
+                          <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                            <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+                          </Style>
+                          <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                            <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+                          </Style>
+                          <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                            <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+                          </Style>
+                        </Style>
+                      </Style>
+                    </HyperlinkButton.Styles>
+                    <TextBlock Text="{Binding Name}">
+                      <TextBlock.IsEnabled>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                          <Binding Path="!IsLooted" />
+                          <Binding Path="!IsPrerequisiteMissing" />
+                        </MultiBinding>
+                      </TextBlock.IsEnabled>
+                    </TextBlock>
+                    <ToolTip.Tip>
+                      <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Can't be looted in the current world state. One or more prerequisites are unavailable" Margin="0 0 0 10"
+                                   IsVisible="{Binding IsPrerequisiteMissing}"/>
+                        <TextBlock Text="Can't be looted in the current world state. For example, if the quest has already been completed and an alternative reward was chosen" Margin="0 0 0 10">
+                          <TextBlock.IsVisible>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                              <Binding  Path="IsLooted" />
+                              <Binding Path="!IsPrerequisiteMissing" />
+                            </MultiBinding>
+                          </TextBlock.IsVisible>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                          <PathIcon Height="20" Width="20" Margin="0 0 3 0" Data="{StaticResource RemnantWikiIcon}"/>
+                          <TextBlock TextDecorations="{x:Null}">Click to go to wiki</TextBlock>
+                        </StackPanel>
+                      </StackPanel>
+                    </ToolTip.Tip>
+                  </HyperlinkButton>
+                </Grid>
 
                 <!-- Column 2 is reserved for spacing-->
 
                 <Grid Grid.Column="3" ColumnDefinitions="Auto, *" Width="350" IsVisible="{Binding OriginNameFormatted, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" >
                   <PathIcon Grid.Column="0" Margin="10 0 10 0" Data="{StaticResource InjectableIcon}" Height="{StaticResource IconSize}" Width="{StaticResource IconSize}"/>
-                  <TextBlock Grid.Column="1" Text="{Binding OriginNameFormatted}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="1" Text="{Binding OriginNameFormatted}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                 </Grid>
                                 
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="20 0 20 0">
