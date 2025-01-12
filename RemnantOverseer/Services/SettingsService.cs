@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Messaging;
-using lib.remnant2.analyzer;
+using lib.remnant2.analyzer.SaveLocation;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Utilities;
 using System;
@@ -38,7 +38,7 @@ public class SettingsService
             // Try to get a path
             try
             {
-                _settings.SaveFilePath = Utils.GetSteamSavePath();
+                _settings.SaveFilePath = SaveUtils.GetSaveFolder();
                 Update(_settings);
             }
             catch
