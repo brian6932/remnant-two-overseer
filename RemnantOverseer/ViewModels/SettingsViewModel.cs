@@ -41,14 +41,21 @@ public partial class SettingsViewModel: ViewModelBase
                             {
                                 FileTypeFilter = [Saves],
                                 AllowMultiple = false,
-                                Title = "Select the profile file"
+                                Title = "Select the profile file. Can be either 'profile.sav' or 'containers.index'"
                             });
 
             if (storageFiles.Count > 0)
             {
-                var selectedFile = storageFiles.First();
+                var selectedFile = storageFiles[0];
                 var settings = _settingsService.Get();
-                var newPath = Path.GetDirectoryName(selectedFile.TryGetLocalPath());
+                var localPath = selectedFile.TryGetLocalPath()!;
+                if (Path.GetExtension(localPath).Equals(".index"))
+                {
+                    // Gamepass need one extra jump
+                    //localPath = new DirectoryInfo(localPath).Parent!.Parent!.FullName;
+                    localPath = Path.GetDirectoryName(localPath);
+                }
+                var newPath = Path.GetDirectoryName(localPath);
 
                 if (newPath == settings.SaveFilePath) return;
                 
@@ -63,6 +70,6 @@ public partial class SettingsViewModel: ViewModelBase
 
     public static FilePickerFileType Saves { get; } = new("Remnant 2 save files")
     {
-        Patterns = ["profile.sav"],
+        Patterns = ["profile.sav", "containers.index"],
     };
 }
