@@ -40,14 +40,13 @@ public class SettingsService
             {
                 _settings.SaveFilePath = SaveUtils.GetSaveFolder();
                 Update(_settings);
+                WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
             }
             catch
             {
                 WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(NotificationStrings.DefaultLocationNotFound));
                 return;
             }
-
-            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
         }
     }
 
@@ -61,11 +60,19 @@ public class SettingsService
 
     public void Update(Settings settings)
     {
-        var json = JsonSerializer.Serialize(settings, options: _options);
-        lock (_lock)
+        try
         {
-            File.WriteAllText(path, json);
-            _settings = settings;
+            var json = JsonSerializer.Serialize(settings, options: _options);
+            lock (_lock)
+            {
+                File.WriteAllText(path, json);
+                _settings = settings;
+            }
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message));
+
         }
     }
 }
