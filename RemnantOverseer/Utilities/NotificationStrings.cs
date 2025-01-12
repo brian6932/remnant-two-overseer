@@ -7,6 +7,7 @@ internal static class NotificationStrings
 
     public static string SaveFileParsingError = "An error was encountered while parsing the save file. Message:";
     public static string FileWatcherFolderNotFound = "The folder with the requested file was not found. Ensure that the path is correct and restart the application";
+    public static string FileWatcherFileNotFound = "The profile was not found. Ensure that the path is correct and restart the application";
 
     public static string SaveFileLocationChanged = "Save file location was changed successfully";
 

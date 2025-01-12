@@ -1,15 +1,16 @@
-﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using lib.remnant2.analyzer;
 using lib.remnant2.analyzer.Model;
+using lib.remnant2.analyzer.SaveLocation;
 using RemnantOverseer.Models.Messages;
-using System;
-using System.IO;
-using System.Reactive.Subjects;
-using System.Reactive.Linq;
 using RemnantOverseer.Utilities;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RemnantOverseer.Services;
 public class SaveDataService
@@ -22,10 +23,7 @@ public class SaveDataService
 
     private string? FilePath => _settingsService.Get().SaveFilePath;
 
-    private static readonly FileSystemWatcher FileWatcher = new()
-    {
-        Filter = "profile.sav",
-    };
+    private static readonly FileSystemWatcher FileWatcher = new();
 
     public SaveDataService(SettingsService settingsService)
     {
@@ -85,6 +83,13 @@ public class SaveDataService
 
         if (Directory.Exists(FilePath))
         {
+            var file = Path.GetFileName(SaveUtils.GetSavePath(FilePath, "profile"));
+            if (file is null)
+            {
+                WeakReferenceMessenger.Default.Send(new NotificationErrorMessage(NotificationStrings.FileWatcherFileNotFound));
+                return false;
+            }
+            FileWatcher.Filter = file;
             FileWatcher.Path = FilePath;
             FileWatcher.EnableRaisingEvents = true;
             return true;
