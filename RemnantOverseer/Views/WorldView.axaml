@@ -159,9 +159,9 @@
                   <!--<PathIcon Grid.Column="1" Data="{StaticResource ImageIcon}" Margin="5 0"/>-->
                 </Grid>
                 <Grid Grid.Column="1" ColumnDefinitions="Auto, Auto, Auto, Auto">
-                  <PathIcon Grid.Column="0" Data="{StaticResource TraitBookIcon}" IsVisible="{Binding IsTraitBookPresent}" IsEnabled="{Binding IsTraitBookLooted}" ToolTip.Tip="Trait Book Available" Margin="5 0"/>
-                  <PathIcon Grid.Column="1" Data="{StaticResource SimulacrumIcon2}" IsVisible="{Binding IsSimulacrumPresent}" IsEnabled="{Binding IsSimulacrumLooted}" ToolTip.Tip="Simulacrum Available" Margin="5 0"/>
-                  <PathIcon Grid.Column="2" Data="{StaticResource BloodmoonIcon}" IsVisible="{Binding IsBloodmoon}" Foreground="{StaticResource BaseAccentColor}" ToolTip.Tip="Bloodmoon" Margin="5 0"/>
+                  <PathIcon Grid.Column="0" Data="{StaticResource TraitBookIcon}" IsVisible="{Binding IsTraitBookPresent}" IsEnabled="{Binding !IsTraitBookLooted}" ToolTip.Tip="Trait Book Available" Margin="5 0"/>
+                  <PathIcon Grid.Column="1" Data="{StaticResource SimulacrumIcon2}" IsVisible="{Binding IsSimulacrumPresent}" IsEnabled="{Binding !IsSimulacrumLooted}" ToolTip.Tip="Simulacrum Available" Margin="5 0"/>
+                  <!--<PathIcon Grid.Column="2" Data="{StaticResource BloodmoonIcon}" IsVisible="{Binding IsBloodmoon}" Foreground="{StaticResource BaseAccentColor}" ToolTip.Tip="Bloodmoon altar present" Margin="5 0"/>-->
                   <PathIcon Grid.Column="2" Data="{StaticResource CurrentLocationIcon}" IsVisible="{Binding IsRespawnLocation}" Foreground="{StaticResource ZoneTransitionColor}" ToolTip.Tip="{Binding FormattedRespawnPointName}" Margin="5 0"/>
                 </Grid>
               </Grid>
