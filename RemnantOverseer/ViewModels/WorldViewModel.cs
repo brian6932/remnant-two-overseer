@@ -55,7 +55,7 @@ public partial class WorldViewModel : ViewModelBase
     public WorldViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
+        Task.Run(async () => { await ReadSave(true, true); this.IsActive = true; });
 
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
@@ -184,7 +184,7 @@ public partial class WorldViewModel : ViewModelBase
 
     // TODO: Look into skipping updates if character index doesn't match and reset is false?
     // Need to think about it, feel like it's a bad idea
-    private async Task ReadSave(bool resetActiveCahracter = false)
+    private async Task ReadSave(bool doResetActiveCharacter, bool doResetCampaignToggle)
     {
         IsLoading = true;
 
@@ -195,8 +195,8 @@ public partial class WorldViewModel : ViewModelBase
             return;
         }
 
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-        if (resetActiveCahracter)
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field. Call private field to avoid filtering on every assignment
+        if (doResetActiveCharacter)
         {
             _selectedCharacterIndex = dataset.ActiveCharacterIndex;
             ResetLocationToggles();
@@ -205,16 +205,18 @@ public partial class WorldViewModel : ViewModelBase
         }
 
         _mappedZones = DatasetMapper.MapCharacterToZones(dataset.Characters[_selectedCharacterIndex]);
-        // Call private field to avoid filtering on every assignment
-        if (dataset.Characters[_selectedCharacterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
+        if (doResetCampaignToggle)
         {
-            _isCampaignSelected = true;
-            OnPropertyChanged(nameof(IsCampaignSelected));
-        }
-        else
-        {
-            _isCampaignSelected = false;
-            OnPropertyChanged(nameof(IsCampaignSelected));
+            if (dataset.Characters[_selectedCharacterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
+            {
+                _isCampaignSelected = true;
+                OnPropertyChanged(nameof(IsCampaignSelected));
+            }
+            else
+            {
+                _isCampaignSelected = false;
+                OnPropertyChanged(nameof(IsCampaignSelected));
+            }
         }
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
@@ -223,10 +225,22 @@ public partial class WorldViewModel : ViewModelBase
         IsLoading = false;
     }
 
-    private async Task CharacterUpdatedHandler(int characerIndex)
+    private async Task CharacterUpdatedHandler(int characterIndex)
     {
-        _selectedCharacterIndex = characerIndex;
-        await ReadSave(false);
+        _selectedCharacterIndex = characterIndex;
+        await ReadSave(false, true);
+    }
+
+    private async Task SaveFileChangedHandler(bool characterCountChanged)
+    {
+        if (characterCountChanged)
+        {
+            await ReadSave(true, true);
+        }
+        else
+        {
+            await ReadSave(false, false);
+        }
     }
 
     private void ResetLocationToggles()
@@ -246,7 +260,7 @@ public partial class WorldViewModel : ViewModelBase
 
         Messenger.Register<WorldViewModel, SaveFileChangedMessage>(this, (r, m) => {
             IsLoading = true;
-            Task.Run(async () => await ReadSave(m.CharacterCountChanged));
+            Task.Run(async () => await SaveFileChangedHandler(m.CharacterCountChanged));
         });
     }
     #endregion Messages
