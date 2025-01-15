@@ -13,6 +13,7 @@ public class Item
     public bool IsLooted { get; set; }
     public bool IsPrerequisiteMissing { get; set; }
     public bool IsCoop { get; set; }
+    public bool IsAccountAward { get; set; }
 
     // We are only interested in a couple of types to display
     public string? OriginNameFormatted

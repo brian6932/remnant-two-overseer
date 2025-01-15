@@ -157,7 +157,8 @@ internal class DatasetMapper
             IsLooted = lootItem.IsLooted,
             IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
             Type = itemType,
-            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
+            IsAccountAward = lootItem.IsVendoredAccountAward
         };
 
         return itemModel;
@@ -179,7 +180,9 @@ internal class DatasetMapper
             OriginName = lootGroup.Name ?? string.Empty,
 
             IsDuplicate = isDuplicate,
-            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
+            IsAccountAward = lootItem.IsVendoredAccountAward
+            
         };
 
         return itemModel;
