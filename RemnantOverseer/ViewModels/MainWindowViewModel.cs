@@ -134,7 +134,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         Messenger.Register<MainWindowViewModel, NotificationErrorMessage>(this, async (r, m) => {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                NotificationManager?.Show(new Notification("Error", m.Value, NotificationType.Error));
+                NotificationManager?.Show(new Notification("Error", m.Value, NotificationType.Error, TimeSpan.Zero));
             });
         });
 
