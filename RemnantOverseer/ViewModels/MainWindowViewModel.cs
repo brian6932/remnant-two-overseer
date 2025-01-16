@@ -131,16 +131,25 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             IsInErrorState = false;
         });
 
-        Messenger.Register<MainWindowViewModel, NotificationErrorMessage>(this, (r, m) => {
-            NotificationManager?.Show(new Notification("Error", m.Value, NotificationType.Error));
+        Messenger.Register<MainWindowViewModel, NotificationErrorMessage>(this, async (r, m) => {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                NotificationManager?.Show(new Notification("Error", m.Value, NotificationType.Error));
+            });
         });
 
-        Messenger.Register<MainWindowViewModel, NotificationWarningMessage>(this, (r, m) => {
-            NotificationManager?.Show(new Notification("Warning", m.Value, NotificationType.Warning));
+        Messenger.Register<MainWindowViewModel, NotificationWarningMessage>(this, async (r, m) => {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                NotificationManager?.Show(new Notification("Warning", m.Value, NotificationType.Warning));
+            });
         });
 
-        Messenger.Register<MainWindowViewModel, NotificationInfoMessage>(this, (r, m) => {
-            NotificationManager?.Show(new Notification("Information", m.Value, NotificationType.Information));
+        Messenger.Register<MainWindowViewModel, NotificationInfoMessage>(this, async (r, m) => {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                NotificationManager?.Show(new Notification("Information", m.Value, NotificationType.Information));
+            });
         });
     }
 
