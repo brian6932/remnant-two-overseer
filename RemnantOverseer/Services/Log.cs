@@ -31,7 +31,7 @@ internal class Log
 
         _instance = config.CreateLogger().ForContext<Program>();
         Instance.Information($"Version {Assembly.GetExecutingAssembly().GetName().Version}");
-        //lib.remnant2.analyzer.Log.Logger = Instance;
-        //lib.remnant2.saves.Log.Logger = Instance;
+        lib.remnant2.analyzer.Log.Logger = Instance;
+        lib.remnant2.saves.Log.Logger = Instance;
     }
 }
