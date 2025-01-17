@@ -52,6 +52,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        Log.Initialize();
     }
 
     public override void OnFrameworkInitializationCompleted()
