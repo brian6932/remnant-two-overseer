@@ -6,9 +6,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
-using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace RemnantOverseer.ViewModels;
