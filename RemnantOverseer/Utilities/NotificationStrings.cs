@@ -11,7 +11,7 @@ internal static class NotificationStrings
 
     public static string SaveFileLocationChanged = "Save file location was changed successfully";
 
-    public static string SelectedCharacterNotValid = "An issue encountered when trying to select active wharacter. Select a character manually";
+    public static string SelectedCharacterNotValid = "An issue encountered when trying to select active character. Select a character manually";
 
     public static string NewerVersionFound = "A new version ({0}) is available";
 }
