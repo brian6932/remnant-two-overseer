@@ -55,11 +55,19 @@ public partial class WorldViewModel : ViewModelBase
     public WorldViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(true, true); this.IsActive = true; });
-
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
+
+        // Set the flag until after onLoaded is executed
+        IsLoading = true;
+    }
+
+    public void OnViewLoaded()
+    {
+        if (IsInitialized) { return; }
+
+        Task.Run(async () => { await ReadSave(true, true); IsActive = true; IsInitialized = true; });
     }
 
     [RelayCommand]

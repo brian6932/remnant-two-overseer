@@ -9,6 +9,7 @@ using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace RemnantOverseer.ViewModels;
@@ -40,7 +41,15 @@ public partial class CharacterSelectViewModel: ViewModelBase
             return;
         }
 
-        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
+        // Set the flag until after onLoaded is executed
+        IsLoading = true;
+    }
+
+    public void OnViewLoaded()
+    {
+        if (IsInitialized) { return; }
+
+        Task.Run(async () => { await ReadSave(true); IsActive = true; IsInitialized = true; });
     }
 
     [RelayCommand]
@@ -100,7 +109,7 @@ public partial class CharacterSelectViewModel: ViewModelBase
                 Messenger.Send(new NotificationWarningMessage(NotificationStrings.SelectedCharacterNotValid));
             }
 
-            Characters = mappedCharacters;
+            Characters = [.. mappedCharacters];
         }
 
         IsLoading = false;

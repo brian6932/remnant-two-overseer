@@ -27,7 +27,7 @@ public partial class MainWindow : Window
         if (DataContext as MainWindowViewModel is null) throw new Exception("DataContext is still empty");
         ((MainWindowViewModel)DataContext).NotificationManager = new Avalonia.Controls.Notifications.WindowNotificationManager(GetTopLevel(this));
         ((MainWindowViewModel)DataContext).NotificationManager!.Position = Avalonia.Controls.Notifications.NotificationPosition.BottomRight;
-        ((MainWindowViewModel)DataContext).OnLoaded();
+        ((MainWindowViewModel)DataContext).OnViewLoaded();
     }
 
     private nint WndProcHook(nint hWnd, uint msg, nint wParam, nint lParam, ref bool handled)
