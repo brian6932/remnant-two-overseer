@@ -59,7 +59,7 @@ internal class DatasetMapper
         var result = new MappedMissingItems();
         foreach(var missingItem in missingItemsDict)
         {
-            var lootItem = new LootItem() { Properties = missingItem };
+            var lootItem = new LootItemExtended() { Properties = missingItem };
             var item = MapLootItemToItem(lootItem);
             result.ItemCategoryList[(int)item.Type].Items.Add(item);
         }
@@ -146,7 +146,7 @@ internal class DatasetMapper
         return result;
     }
 
-    private static Models.Item MapLootItemToItem(LootItem lootItem)
+    private static Models.Item MapLootItemToItem(LootItemExtended lootItem)
     {
         Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
         var itemModel = new Models.Item
@@ -164,7 +164,7 @@ internal class DatasetMapper
         return itemModel;
     }
 
-    private static Models.Item MapLootItemToItem(LootItem lootItem, LootGroup lootGroup, bool isDuplicate)
+    private static Models.Item MapLootItemToItem(LootItemExtended lootItem, LootGroup lootGroup, bool isDuplicate)
     {
         Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
         Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
