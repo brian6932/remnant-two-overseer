@@ -156,6 +156,7 @@ internal class DatasetMapper
             Description = lootItem.ItemNotes,
             IsLooted = lootItem.IsLooted,
             IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
+            HasRequiredMaterial = lootItem.HasRequiredMaterial,
             Type = itemType,
             IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
             IsAccountAward = lootItem.IsVendoredAccountAward

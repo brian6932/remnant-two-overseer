@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using RemnantOverseer.ViewModels;
 using System;
@@ -23,5 +24,14 @@ public partial class WorldView : UserControl
         base.OnLoaded(e);
         if (DataContext as WorldViewModel is null) throw new Exception("DataContext is still empty");
         ((WorldViewModel)DataContext).OnViewLoaded();
+    }
+
+    // Flyout can only be shown by explicitly calling it
+    private void FiltersButton_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        if (sender is Control control)
+        {
+            FlyoutBase.ShowAttachedFlyout(control);
+        }
     }
 }

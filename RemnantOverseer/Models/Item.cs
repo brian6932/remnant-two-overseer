@@ -12,6 +12,7 @@ public class Item
     public bool IsDuplicate { get; set; }
     public bool IsLooted { get; set; }
     public bool IsPrerequisiteMissing { get; set; }
+    public bool HasRequiredMaterial { get; set; }
     public bool IsCoop { get; set; }
     public bool IsAccountAward { get; set; }
 

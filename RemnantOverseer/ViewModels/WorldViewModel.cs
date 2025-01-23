@@ -6,6 +6,7 @@ using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -37,6 +38,15 @@ public partial class WorldViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _hideDuplicates = true;
+
+    [ObservableProperty]
+    private bool _hideLootedItems = false;
+
+    [ObservableProperty]
+    private bool _hideMissingPrerequisiteItems = false;
+
+    [ObservableProperty]
+    private bool _hideHasRequiredMaterialItems = false;
 
     [ObservableProperty]
     private bool _isNerudFilterChecked = false;
@@ -89,6 +99,23 @@ public partial class WorldViewModel : ViewModelBase
         ApplyFilter();
     }
 
+    // Additional filters
+    partial void OnHideLootedItemsChanged(bool value)
+    {
+        ApplyFilter();
+    }
+
+    partial void OnHideMissingPrerequisiteItemsChanged(bool value)
+    {
+        ApplyFilter();
+    }
+
+    partial void OnHideHasRequiredMaterialItemsChanged(bool value)
+    {
+        ApplyFilter();
+    }
+    // ~Additional filters
+
     partial void OnFilterTextChanged(string? value)
     {
         _filterTextSubject.OnNext(value);
@@ -136,6 +163,7 @@ public partial class WorldViewModel : ViewModelBase
     public void ResetFilters()
     {
         ResetLocationToggles();
+        ResetAdditionalFilters();
         if (FilterText == null) ApplyFilter(); // If there is no filtertext but toggles were set, still need to filter
         FilterText = null;
     }
@@ -168,19 +196,34 @@ public partial class WorldViewModel : ViewModelBase
                 tempLocation.Items = [];
 
                 // Add more processing if necessary. Remove special characters?
-                List<Item> tempItems = [];
+                IEnumerable<Item> tempItemsQuery = [];
                 if (!string.IsNullOrEmpty(value))
                 {
-                    tempItems = location.Items.Where(i => i.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || i.OriginName.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList();
+                    tempItemsQuery = location.Items.Where(i => i.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || i.OriginName.Contains(value, StringComparison.OrdinalIgnoreCase));
                 }
                 else
                 {
-                    tempItems.AddRange(location.Items);
+                    tempItemsQuery = [..location.Items];
                 }
+
                 if (HideDuplicates)
                 {
-                    tempItems = tempItems.Where(i => !i.IsDuplicate).ToList();
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsDuplicate);
                 }
+                if (HideLootedItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsLooted);
+                }
+                if (HideMissingPrerequisiteItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsPrerequisiteMissing);
+                }
+                if (HideHasRequiredMaterialItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.HasRequiredMaterial);
+                }
+
+                var tempItems = tempItemsQuery.ToList();
                 if (tempItems.Count != 0) { tempLocation.Items = tempItems; tempZone.Locations.Add(tempLocation); }
             }
             if (tempZone.Locations.Count != 0) { tempFilteredZones.Add(tempZone); }
@@ -256,6 +299,13 @@ public partial class WorldViewModel : ViewModelBase
         IsNerudFilterChecked = false;
         IsYaeshaFilterChecked = false;
         IsLosomnFilterChecked = false;
+    }
+
+    private void ResetAdditionalFilters()
+    {
+        HideLootedItems = false;
+        HideMissingPrerequisiteItems = false;
+        HideHasRequiredMaterialItems = false;
     }
 
     #region Messages
