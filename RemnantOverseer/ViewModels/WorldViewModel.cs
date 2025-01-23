@@ -377,7 +377,7 @@ public partial class WorldViewModel : ViewModelBase
         }
         if (updateQueued)
         {
-            Task.Run(() => _settingsService.Update(settings));
+            Task.Run(() => _settingsService.UpdateAsync(settings));
         }
     }
 
