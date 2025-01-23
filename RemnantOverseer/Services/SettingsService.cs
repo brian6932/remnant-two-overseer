@@ -6,11 +6,14 @@ using RemnantOverseer.Utilities;
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RemnantOverseer.Services;
 public class SettingsService
 {
     private readonly object _lock = new object();
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     private readonly string path = Path.Combine(AppContext.BaseDirectory, "settings.json");
     private Settings _settings = new();
     private JsonSerializerOptions _options = new() { WriteIndented = true };
@@ -72,7 +75,25 @@ public class SettingsService
         catch (Exception ex)
         {
             WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message));
+        }
+    }
 
+    public async Task UpdateAsync(Settings settings)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var json = JsonSerializer.Serialize(settings, options: _options);
+            await File.WriteAllTextAsync(path, json);
+            _settings = settings;
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message));
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
 }

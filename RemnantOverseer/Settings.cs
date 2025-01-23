@@ -2,4 +2,8 @@
 public class Settings
 {
     public string? SaveFilePath { get; set; }
+    public bool? HideDuplicates { get; set; }
+    public bool? HideLootedItems { get; set; }
+    public bool? HideMissingPrerequisiteItems { get; set; }
+    public bool? HideHasRequiredMaterialItems { get; set; }
 }

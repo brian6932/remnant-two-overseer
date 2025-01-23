@@ -6,7 +6,6 @@ using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -18,6 +17,7 @@ namespace RemnantOverseer.ViewModels;
 
 public partial class WorldViewModel : ViewModelBase
 {
+    private readonly SettingsService _settingsService;
     private readonly SaveDataService _saveDataService;
 
     private MappedZones _mappedZones = new();
@@ -62,12 +62,14 @@ public partial class WorldViewModel : ViewModelBase
 
     private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
-    public WorldViewModel(SaveDataService saveDataService)
+    public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
+        _settingsService = settingsService;
         _saveDataService = saveDataService;
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
+        ApplySettings();
 
         // Set the flag until after onLoaded is executed
         IsLoading = true;
@@ -97,22 +99,46 @@ public partial class WorldViewModel : ViewModelBase
     partial void OnHideDuplicatesChanged(bool value)
     {
         ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideDuplicates = value;
+            await _settingsService.UpdateAsync(settings);
+        });
     }
 
     // Additional filters
     partial void OnHideLootedItemsChanged(bool value)
     {
         ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideLootedItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
     }
 
     partial void OnHideMissingPrerequisiteItemsChanged(bool value)
     {
         ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideMissingPrerequisiteItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
     }
 
     partial void OnHideHasRequiredMaterialItemsChanged(bool value)
     {
         ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideHasRequiredMaterialItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
     }
     // ~Additional filters
 
@@ -301,11 +327,58 @@ public partial class WorldViewModel : ViewModelBase
         IsLosomnFilterChecked = false;
     }
 
+    // Updating the file three times in a row is... le bad? Maybe.
     private void ResetAdditionalFilters()
     {
         HideLootedItems = false;
         HideMissingPrerequisiteItems = false;
         HideHasRequiredMaterialItems = false;
+    }
+
+    private void ApplySettings()
+    {
+        var updateQueued = false;
+        var settings = _settingsService.Get();
+        if (settings.HideDuplicates.HasValue)
+        {
+            HideDuplicates = settings.HideDuplicates.Value;
+        }
+        else
+        {
+            settings.HideDuplicates = true;
+            updateQueued = true;
+        }
+        if (settings.HideLootedItems.HasValue)
+        {
+            HideLootedItems = settings.HideLootedItems.Value;
+        }
+        else
+        {
+            settings.HideLootedItems = false;
+            updateQueued = true;
+        }
+        if (settings.HideMissingPrerequisiteItems.HasValue)
+        {
+            HideMissingPrerequisiteItems = settings.HideMissingPrerequisiteItems.Value;
+        }
+        else
+        {
+            settings.HideMissingPrerequisiteItems = false;
+            updateQueued = true;
+        }
+        if (settings.HideHasRequiredMaterialItems.HasValue)
+        {
+            HideHasRequiredMaterialItems = settings.HideHasRequiredMaterialItems.Value;
+        }
+        else
+        {
+            settings.HideHasRequiredMaterialItems = false;
+            updateQueued = true;
+        }
+        if (updateQueued)
+        {
+            Task.Run(() => _settingsService.Update(settings));
+        }
     }
 
     #region Messages
