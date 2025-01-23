@@ -62,7 +62,9 @@ public class SaveDataService
         }
         catch (Exception ex)
         {
-            WeakReferenceMessenger.Default.Send(new NotificationErrorMessage($"{NotificationStrings.SaveFileParsingError}{Environment.NewLine}{ex.Message}"));
+            var message = $"{NotificationStrings.SaveFileParsingError}{Environment.NewLine}{ex.Message}";
+            WeakReferenceMessenger.Default.Send(new NotificationErrorMessage(message));
+            Log.Instance.Error(message);
         }
         finally
         {
@@ -91,28 +93,33 @@ public class SaveDataService
             if (file is null)
             {
                 WeakReferenceMessenger.Default.Send(new NotificationErrorMessage(NotificationStrings.FileWatcherFileNotFound));
+                Log.Instance.Error(NotificationStrings.FileWatcherFileNotFound);
                 return false;
             }
             FileWatcher.Filter = file;
             FileWatcher.Path = FilePath;
             FileWatcher.EnableRaisingEvents = true;
+            Log.Instance.Information($"Started watching at {FilePath}");
             return true;
         }
         else
         {
             FileWatcher.EnableRaisingEvents = false;
             WeakReferenceMessenger.Default.Send(new NotificationErrorMessage(NotificationStrings.FileWatcherFolderNotFound));
+            Log.Instance.Error(NotificationStrings.FileWatcherFolderNotFound);
             return false;
         }
     }
     public void PauseWatching()
     {
         FileWatcher.EnableRaisingEvents = false;
+        Log.Instance.Information($"Stopped watching at {FilePath}");
     }
     public void ResumeWatching()
     {
         if (FileWatcher.Path == null) return;
         FileWatcher.EnableRaisingEvents = true;
+        Log.Instance.Information($"Resumed watching at {FilePath}");
     }
 
     private void OnSaveFileChanged(object sender, FileSystemEventArgs e)

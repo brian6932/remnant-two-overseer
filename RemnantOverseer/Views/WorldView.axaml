@@ -117,7 +117,7 @@
                 <PathIcon Grid.Column="0" Data="{StaticResource FiltersIcon}" Width="14" Margin="5 0"/>
               </Grid>
               <Button.Flyout>
-                <Flyout Placement="BottomEdgeAlignedLeft" VerticalOffset="5">
+                <Flyout Placement="Bottom" VerticalOffset="5">
                   <StackPanel Spacing="5">
                     <StackPanel.Styles>
                       <Style Selector="ToggleButton">

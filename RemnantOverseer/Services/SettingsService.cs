@@ -44,10 +44,12 @@ public class SettingsService
                 _settings.SaveFilePath = SaveUtils.GetSaveFolder();
                 Update(_settings);
                 WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
+                Log.Instance.Information(NotificationStrings.DefaultLocationFound);
             }
             catch
             {
                 WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(NotificationStrings.DefaultLocationNotFound));
+                Log.Instance.Warning(NotificationStrings.DefaultLocationNotFound);
                 return;
             }
         }
@@ -74,7 +76,9 @@ public class SettingsService
         }
         catch (Exception ex)
         {
-            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message));
+            var message = NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message;
+            WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(message));
+            Log.Instance.Warning(message);
         }
     }
 
@@ -89,7 +93,9 @@ public class SettingsService
         }
         catch (Exception ex)
         {
-            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message));
+            var message = NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message;
+            WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(message));
+            Log.Instance.Warning(message);
         }
         finally
         {
