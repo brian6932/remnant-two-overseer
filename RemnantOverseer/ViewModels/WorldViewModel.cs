@@ -275,7 +275,7 @@ public partial class WorldViewModel : ViewModelBase
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field. Call private field to avoid filtering on every assignment
         if (doResetActiveCharacter)
         {
-            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = DatasetMapper.GetActiveCharacterIndex(dataset);
             ResetLocationToggles();
             _filterText = null;
             OnPropertyChanged(nameof(FilterText));

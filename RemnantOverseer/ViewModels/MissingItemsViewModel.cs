@@ -86,7 +86,7 @@ public partial class MissingItemsViewModel : ViewModelBase
 
         if (resetActiveCahracter)
         {
-            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = DatasetMapper.GetActiveCharacterIndex(dataset);
             // Call private field to avoid filtering on every assignment
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             _filterText = null;

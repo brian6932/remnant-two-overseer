@@ -178,7 +178,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                 SelectedCharacter = null;
                 return;
             }
-            var index = resetActiveCharacter ? ds.ActiveCharacterIndex : SelectedCharacter?.Index ?? 0;
+            var index = resetActiveCharacter ? DatasetMapper.GetActiveCharacterIndex(ds) : SelectedCharacter?.Index ?? 0;
             SelectedCharacter = DatasetMapper.MapCharacter(ds.Characters[index]);
         });
     }

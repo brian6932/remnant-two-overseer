@@ -94,7 +94,7 @@ public partial class CharacterSelectViewModel: ViewModelBase
 #endif
             if (resetActiveCahracter)
             {
-                _selectedCharacterIndex = data.ActiveCharacterIndex;
+                _selectedCharacterIndex = DatasetMapper.GetActiveCharacterIndex(data);
             }
 
             if (_selectedCharacterIndex >= 0)

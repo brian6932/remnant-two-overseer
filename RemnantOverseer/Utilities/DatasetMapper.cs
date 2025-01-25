@@ -67,6 +67,11 @@ internal class DatasetMapper
         return result;
     }
 
+    public static int GetActiveCharacterIndex(Dataset dataset)
+    {
+        return dataset.Characters.Count <= dataset.ActiveCharacterIndex ? 0 : dataset.ActiveCharacterIndex;
+    }
+
     private static List<Models.Zone> MapZonesToZones(List<Zone> zones, List<string> missingItemIds, RespawnPoint? respawnPoint)
     {
         //var locnames = new List<string>();
