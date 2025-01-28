@@ -1,16 +1,19 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Messaging;
-using lib.remnant2.analyzer;
+using lib.remnant2.analyzer.SaveLocation;
 using RemnantOverseer.Models.Messages;
 using RemnantOverseer.Utilities;
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RemnantOverseer.Services;
 public class SettingsService
 {
     private readonly object _lock = new object();
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     private readonly string path = Path.Combine(AppContext.BaseDirectory, "settings.json");
     private Settings _settings = new();
     private JsonSerializerOptions _options = new() { WriteIndented = true };
@@ -38,15 +41,17 @@ public class SettingsService
             // Try to get a path
             try
             {
-                _settings.SaveFilePath = Utils.GetSteamSavePath();
+                _settings.SaveFilePath = SaveUtils.GetSaveFolder();
                 Update(_settings);
+                WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
+                Log.Instance.Information(NotificationStrings.DefaultLocationFound);
             }
             catch
             {
                 WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(NotificationStrings.DefaultLocationNotFound));
+                Log.Instance.Warning(NotificationStrings.DefaultLocationNotFound);
+                return;
             }
-
-            WeakReferenceMessenger.Default.Send(new NotificationInfoMessage(NotificationStrings.DefaultLocationFound));
         }
     }
 
@@ -60,11 +65,41 @@ public class SettingsService
 
     public void Update(Settings settings)
     {
-        var json = JsonSerializer.Serialize(settings, options: _options);
-        lock (_lock)
+        try
         {
-            File.WriteAllText(path, json);
+            var json = JsonSerializer.Serialize(settings, options: _options);
+            lock (_lock)
+            {
+                File.WriteAllText(path, json);
+                _settings = settings;
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message;
+            WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(message));
+            Log.Instance.Warning(message);
+        }
+    }
+
+    public async Task UpdateAsync(Settings settings)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var json = JsonSerializer.Serialize(settings, options: _options);
+            await File.WriteAllTextAsync(path, json);
             _settings = settings;
+        }
+        catch (Exception ex)
+        {
+            var message = NotificationStrings.ErrorWhenUpdatingSettings + Environment.NewLine + ex.Message;
+            WeakReferenceMessenger.Default.Send(new NotificationWarningMessage(message));
+            Log.Instance.Warning(message);
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
 }

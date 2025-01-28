@@ -16,7 +16,27 @@ public class ArchetypeToImageConverter: IValueConverter
         }
         else
         {
-            return new Bitmap(AssetLoader.Open(new Uri($"avares://RemnantOverseer/Assets/Images/Archetypes/T_UI_Icon_Archetype_{value}.png")));
+            string name = (Archetypes)value switch
+            {
+                Archetypes.Alchemist => "Alchemist",
+                Archetypes.Archon => "Arcanist",
+                Archetypes.Challenger => "Defender",
+                Archetypes.Engineer => "Engineer",
+                Archetypes.Explorer => "Explorer",
+                Archetypes.Gunslinger => "Gunslinger",
+                Archetypes.Handler => "Handler",
+                Archetypes.Hunter => "Sharpshooter",
+                Archetypes.Invader => "Invader",
+                Archetypes.Invoker => "Invoker",
+                Archetypes.Medic => "Medic",
+                Archetypes.Ritualist => "Ritualist",
+                Archetypes.Summoner => "Summoner",
+                Archetypes.Warden => "Warden",
+                Archetypes.Unknown => "Unknown",
+                _ => throw new NotImplementedException(),
+            };
+
+            return new Bitmap(AssetLoader.Open(new Uri($"avares://RemnantOverseer/Assets/Images/Archetypes/T_UI_Icon_Archetype_{name}.png")));
         }
     }
 

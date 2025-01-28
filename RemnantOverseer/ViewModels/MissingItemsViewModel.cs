@@ -37,10 +37,19 @@ public partial class MissingItemsViewModel : ViewModelBase
     public MissingItemsViewModel(SaveDataService saveDataService)
     {
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
+
+        // Set the flag until after onLoaded is executed
+        IsLoading = true;
+    }
+
+    public void OnViewLoaded()
+    {
+        if (IsInitialized) { return; }
+
+        Task.Run(async () => { await ReadSave(true); IsActive = true; IsInitialized = true; });
     }
 
     [RelayCommand]
@@ -77,7 +86,7 @@ public partial class MissingItemsViewModel : ViewModelBase
 
         if (resetActiveCahracter)
         {
-            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = DatasetMapper.GetActiveCharacterIndex(dataset);
             // Call private field to avoid filtering on every assignment
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             _filterText = null;

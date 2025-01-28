@@ -63,32 +63,6 @@
                         Command="{Binding $parent[ListBox].((vm:CharacterSelectViewModel)DataContext).CharacterSelected}"
                         CommandParameter="{Binding}">
             <Panel>
-              <!-- ugh -->
-              <Border Name="InnerBorder" BorderBrush="{StaticResource InnerBorderBrush}" BorderThickness="2"
-                      CornerRadius="{Binding, Converter={StaticResource DoubleToCornerRadiusConverter}, ConverterParameter={StaticResource BorderRadiusValue}}"
-                      Background="Transparent" Margin="5" ZIndex="5" IsHitTestVisible="False">
-                <Border.Styles>
-                  <Style Selector="Border#InnerBorder">
-                    <Setter Property="BoxShadow" Value="inset 0 0 4 1 #FF070707" />
-                  </Style>
-                </Border.Styles>
-              </Border>
-              <Border Name="OuterBorder" BorderThickness="3" CornerRadius="12" Background="Transparent" ZIndex="5" IsHitTestVisible="False">
-                <Border.Styles>
-                  <Style Selector="ListBoxItem Border#OuterBorder" >
-                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderInactiveBrush}" />
-                  </Style>
-                  <Style Selector="ListBoxItem:pointerover Border#OuterBorder">
-                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderBrush}" />
-                    <Setter Property="BoxShadow" Value="0 0 7 3 #c3c3c3" />
-                  </Style>
-                  <Style Selector="ToggleButton#ListBoxButton:checked Border#OuterBorder">
-                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderBrush}" />
-                    <Setter Property="BoxShadow" Value="0 0 4 2 #c3c3c3" />
-                  </Style>
-                </Border.Styles>
-              </Border>
-
               <!-- Wtf? -->
               <!-- https://stackoverflow.com/questions/54641525/how-to-add-individual-rounded-corners-on-an-image-control -->
               <!-- https://stackoverflow.com/questions/324641/how-to-make-the-contents-of-a-round-cornered-border-be-also-round-cornered -->
@@ -154,7 +128,7 @@
                       <Border Background="{StaticResource PowerLevelBackgoundBrush}" CornerRadius="5"></Border>
                       <StackPanel Orientation="Horizontal" Margin="5" ToolTip.Tip="Power Level" IsHitTestVisible="True">
                         <PathIcon Data="{StaticResource PowerLevelIcon}" Height="20" Width="20" Margin="5 0"/>
-                        <TextBlock Text="{Binding PowerLevel}" FontWeight="Bold" FontSize="20" />
+                        <TextBlock Text="{Binding FormattedPowerLevel}" FontWeight="Bold" FontSize="20" />
                       </StackPanel>
                     </Panel>
                     <Panel Grid.Row="1" Grid.Column="2" Margin="10 5">
@@ -185,6 +159,33 @@
 
                 </Grid>
               </Grid>
+              
+              <!-- Outline and inline shadow -->
+              <!-- background needs to be null to not overlay tooltips for hit test purposes -->
+              <Border Name="InnerBorder" BorderBrush="{StaticResource InnerBorderBrush}" BorderThickness="2"
+                      CornerRadius="{Binding, Converter={StaticResource DoubleToCornerRadiusConverter}, ConverterParameter={StaticResource BorderRadiusValue}}"
+                      Background="{x:Null}" Margin="5">
+                <Border.Styles>
+                  <Style Selector="Border#InnerBorder">
+                    <Setter Property="BoxShadow" Value="inset 0 0 4 1 #FF070707" />
+                  </Style>
+                </Border.Styles>
+              </Border>
+              <Border Name="OuterBorder" BorderThickness="3" CornerRadius="12" Background="{x:Null}">
+                <Border.Styles>
+                  <Style Selector="ListBoxItem Border#OuterBorder" >
+                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderInactiveBrush}" />
+                  </Style>
+                  <Style Selector="ListBoxItem:pointerover Border#OuterBorder">
+                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderBrush}" />
+                    <Setter Property="BoxShadow" Value="0 0 7 3 #c3c3c3" />
+                  </Style>
+                  <Style Selector="ToggleButton#ListBoxButton:checked Border#OuterBorder">
+                    <Setter Property="BorderBrush" Value="{StaticResource OuterBorderBrush}" />
+                    <Setter Property="BoxShadow" Value="0 0 4 2 #c3c3c3" />
+                  </Style>
+                </Border.Styles>
+              </Border>
             </Panel>
           </ToggleButton>
         </DataTemplate>

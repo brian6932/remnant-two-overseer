@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:views="clr-namespace:RemnantOverseer.Views"
+        xmlns:util="using:RemnantOverseer.Utilities"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="RemnantOverseer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -16,17 +17,14 @@
         ExtendClientAreaToDecorationsHint="True">
 
   <Window.Styles>
-    <!--<Style Selector="RadioButton.SidebarButton">
-      <Setter Property="Width" Value="80" />
-      <Setter Property="Height" Value="80" />
+    <Style Selector="WindowNotificationManager">
       <Setter Property="Margin" Value="10" />
-      <Setter Property="CornerRadius" Value="8"/>
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>-->
+    </Style>
   </Window.Styles>
 
   <Window.Resources>
     <sys:Double x:Key="IconSize">30</sys:Double>
+    <util:ArchetypeToBackgroundConverter x:Key="ArchetypeToBackgroundConverter"/>
 
     <!-- What? -->
     <!-- https://github.com/AvaloniaUI/AvaloniaUI.QuickGuides/blob/main/ButtonCustomize/Views/MainWindow.axaml -->
@@ -69,9 +67,44 @@
 
   <Grid RowDefinitions="30,*">
     <!-- Title bar -->
-    <Grid ColumnDefinitions="Auto,*" IsHitTestVisible="False">
+    <Grid ColumnDefinitions="Auto, Auto, Auto, *" IsHitTestVisible="False">
       <Image      Grid.Column="0" VerticalAlignment="Center" Source="/Assets/IconShadow.ico" Width="18" Margin="12,0,12,0" RenderOptions.BitmapInterpolationMode="HighQuality"></Image>
       <TextBlock  Grid.Column="1" VerticalAlignment="Center" FontSize="12" >Remnant Overseer</TextBlock>
+      <Grid Grid.Column="2" ColumnDefinitions="Auto, Auto, Auto, Auto" VerticalAlignment="Center" IsVisible="{Binding SelectedCharacter, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <Grid.Styles>
+          <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+          </Style>
+          <Style Selector="Ellipse">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Clip">
+              <RectangleGeometry Rect="0,0,8,16"/>
+            </Setter>
+          </Style>
+        </Grid.Styles>
+        <TextBlock Grid.Column="0" Text="[" Margin="20 0 5 0"/>
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}">
+          <Ellipse.RenderTransform>
+            <RotateTransform Angle="45" />
+          </Ellipse.RenderTransform>
+        </Ellipse>
+        <!-- I think this is the easiest way to go about it honestly (single archetype support) -->
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.Archetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}"
+                 IsVisible="{Binding SelectedCharacter.SubArchetype, Converter={x:Static ObjectConverters.IsNull}}">
+          <Ellipse.RenderTransform>
+            <RotateTransform Angle="225" />
+          </Ellipse.RenderTransform>
+        </Ellipse>
+        <Ellipse Grid.Column="1" Fill="{Binding SelectedCharacter.SubArchetype, Converter={StaticResource ArchetypeToBackgroundConverter}, ConverterParameter=50}">
+          <Ellipse.RenderTransform>
+            <RotateTransform Angle="225" />
+          </Ellipse.RenderTransform>
+        </Ellipse>
+        <TextBlock Grid.Column="2" Text="{Binding SelectedCharacter.Summary}" Margin="5 0"/>
+        <TextBlock Grid.Column="3" Text="]" Margin="0 0 10 0"/>
+      </Grid>
     </Grid>
 
     <Grid Grid.Row="1" ColumnDefinitions="80, 3, *">
@@ -108,7 +141,7 @@
       <Border Grid.Column="1" CornerRadius="3" Background="{StaticResource OuterBorderInactiveBrush}" Margin="0 5" />
       
       <!-- Content -->
-      <ContentControl Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding ContentViewModel}"></ContentControl>
+      <TransitioningContentControl Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding ContentViewModel}" />
       <Border Grid.Column="2" IsVisible="{Binding !CanDisplayContent}" Background="{StaticResource GlobalBackroundBrush}">
         <TextBlock FontSize="18" xml:space="preserve" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center">
         It looks like we've encountered an error.

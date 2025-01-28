@@ -17,6 +17,7 @@ namespace RemnantOverseer.ViewModels;
 
 public partial class WorldViewModel : ViewModelBase
 {
+    private readonly SettingsService _settingsService;
     private readonly SaveDataService _saveDataService;
 
     private MappedZones _mappedZones = new();
@@ -39,6 +40,15 @@ public partial class WorldViewModel : ViewModelBase
     private bool _hideDuplicates = true;
 
     [ObservableProperty]
+    private bool _hideLootedItems = false;
+
+    [ObservableProperty]
+    private bool _hideMissingPrerequisiteItems = false;
+
+    [ObservableProperty]
+    private bool _hideHasRequiredMaterialItems = false;
+
+    [ObservableProperty]
     private bool _isNerudFilterChecked = false;
 
     [ObservableProperty]
@@ -52,14 +62,24 @@ public partial class WorldViewModel : ViewModelBase
 
     private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
-    public WorldViewModel(SaveDataService saveDataService)
+    public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
+        _settingsService = settingsService;
         _saveDataService = saveDataService;
-        Task.Run(async () => { await ReadSave(true); this.IsActive = true; });
-
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
+        ApplySettings();
+
+        // Set the flag until after onLoaded is executed
+        IsLoading = true;
+    }
+
+    public void OnViewLoaded()
+    {
+        if (IsInitialized) { return; }
+
+        Task.Run(async () => { await ReadSave(true, true); IsActive = true; IsInitialized = true; });
     }
 
     [RelayCommand]
@@ -79,7 +99,48 @@ public partial class WorldViewModel : ViewModelBase
     partial void OnHideDuplicatesChanged(bool value)
     {
         ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideDuplicates = value;
+            await _settingsService.UpdateAsync(settings);
+        });
     }
+
+    // Additional filters
+    partial void OnHideLootedItemsChanged(bool value)
+    {
+        ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideLootedItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
+    }
+
+    partial void OnHideMissingPrerequisiteItemsChanged(bool value)
+    {
+        ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideMissingPrerequisiteItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
+    }
+
+    partial void OnHideHasRequiredMaterialItemsChanged(bool value)
+    {
+        ApplyFilter();
+        Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideHasRequiredMaterialItems = value;
+            await _settingsService.UpdateAsync(settings);
+        });
+    }
+    // ~Additional filters
 
     partial void OnFilterTextChanged(string? value)
     {
@@ -128,6 +189,7 @@ public partial class WorldViewModel : ViewModelBase
     public void ResetFilters()
     {
         ResetLocationToggles();
+        ResetAdditionalFilters();
         if (FilterText == null) ApplyFilter(); // If there is no filtertext but toggles were set, still need to filter
         FilterText = null;
     }
@@ -160,19 +222,34 @@ public partial class WorldViewModel : ViewModelBase
                 tempLocation.Items = [];
 
                 // Add more processing if necessary. Remove special characters?
-                List<Item> tempItems = [];
+                IEnumerable<Item> tempItemsQuery = [];
                 if (!string.IsNullOrEmpty(value))
                 {
-                    tempItems = location.Items.Where(i => i.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || i.OriginName.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList();
+                    tempItemsQuery = location.Items.Where(i => i.Name.Contains(value, StringComparison.OrdinalIgnoreCase) || i.OriginName.Contains(value, StringComparison.OrdinalIgnoreCase));
                 }
                 else
                 {
-                    tempItems.AddRange(location.Items);
+                    tempItemsQuery = [..location.Items];
                 }
+
                 if (HideDuplicates)
                 {
-                    tempItems = tempItems.Where(i => !i.IsDuplicate).ToList();
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsDuplicate);
                 }
+                if (HideLootedItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsLooted);
+                }
+                if (HideMissingPrerequisiteItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.IsPrerequisiteMissing);
+                }
+                if (HideHasRequiredMaterialItems)
+                {
+                    tempItemsQuery = tempItemsQuery.Where(i => !i.HasRequiredMaterial);
+                }
+
+                var tempItems = tempItemsQuery.ToList();
                 if (tempItems.Count != 0) { tempLocation.Items = tempItems; tempZone.Locations.Add(tempLocation); }
             }
             if (tempZone.Locations.Count != 0) { tempFilteredZones.Add(tempZone); }
@@ -184,7 +261,7 @@ public partial class WorldViewModel : ViewModelBase
 
     // TODO: Look into skipping updates if character index doesn't match and reset is false?
     // Need to think about it, feel like it's a bad idea
-    private async Task ReadSave(bool resetActiveCahracter = false)
+    private async Task ReadSave(bool doResetActiveCharacter, bool doResetCampaignToggle)
     {
         IsLoading = true;
 
@@ -195,26 +272,28 @@ public partial class WorldViewModel : ViewModelBase
             return;
         }
 
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-        if (resetActiveCahracter)
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field. Call private field to avoid filtering on every assignment
+        if (doResetActiveCharacter)
         {
-            _selectedCharacterIndex = dataset.ActiveCharacterIndex;
+            _selectedCharacterIndex = DatasetMapper.GetActiveCharacterIndex(dataset);
             ResetLocationToggles();
             _filterText = null;
             OnPropertyChanged(nameof(FilterText));
         }
 
         _mappedZones = DatasetMapper.MapCharacterToZones(dataset.Characters[_selectedCharacterIndex]);
-        // Call private field to avoid filtering on every assignment
-        if (dataset.Characters[_selectedCharacterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
+        if (doResetCampaignToggle)
         {
-            _isCampaignSelected = true;
-            OnPropertyChanged(nameof(IsCampaignSelected));
-        }
-        else
-        {
-            _isCampaignSelected = false;
-            OnPropertyChanged(nameof(IsCampaignSelected));
+            if (dataset.Characters[_selectedCharacterIndex].ActiveWorldSlot == lib.remnant2.analyzer.Enums.WorldSlot.Campaign)
+            {
+                _isCampaignSelected = true;
+                OnPropertyChanged(nameof(IsCampaignSelected));
+            }
+            else
+            {
+                _isCampaignSelected = false;
+                OnPropertyChanged(nameof(IsCampaignSelected));
+            }
         }
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
@@ -223,10 +302,22 @@ public partial class WorldViewModel : ViewModelBase
         IsLoading = false;
     }
 
-    private async Task CharacterUpdatedHandler(int characerIndex)
+    private async Task CharacterUpdatedHandler(int characterIndex)
     {
-        _selectedCharacterIndex = characerIndex;
-        await ReadSave(false);
+        _selectedCharacterIndex = characterIndex;
+        await ReadSave(false, true);
+    }
+
+    private async Task SaveFileChangedHandler(bool characterCountChanged)
+    {
+        if (characterCountChanged)
+        {
+            await ReadSave(true, true);
+        }
+        else
+        {
+            await ReadSave(false, false);
+        }
     }
 
     private void ResetLocationToggles()
@@ -234,6 +325,60 @@ public partial class WorldViewModel : ViewModelBase
         IsNerudFilterChecked = false;
         IsYaeshaFilterChecked = false;
         IsLosomnFilterChecked = false;
+    }
+
+    // Updating the file three times in a row is... le bad? Maybe.
+    private void ResetAdditionalFilters()
+    {
+        HideLootedItems = false;
+        HideMissingPrerequisiteItems = false;
+        HideHasRequiredMaterialItems = false;
+    }
+
+    private void ApplySettings()
+    {
+        var updateQueued = false;
+        var settings = _settingsService.Get();
+        if (settings.HideDuplicates.HasValue)
+        {
+            HideDuplicates = settings.HideDuplicates.Value;
+        }
+        else
+        {
+            settings.HideDuplicates = true;
+            updateQueued = true;
+        }
+        if (settings.HideLootedItems.HasValue)
+        {
+            HideLootedItems = settings.HideLootedItems.Value;
+        }
+        else
+        {
+            settings.HideLootedItems = false;
+            updateQueued = true;
+        }
+        if (settings.HideMissingPrerequisiteItems.HasValue)
+        {
+            HideMissingPrerequisiteItems = settings.HideMissingPrerequisiteItems.Value;
+        }
+        else
+        {
+            settings.HideMissingPrerequisiteItems = false;
+            updateQueued = true;
+        }
+        if (settings.HideHasRequiredMaterialItems.HasValue)
+        {
+            HideHasRequiredMaterialItems = settings.HideHasRequiredMaterialItems.Value;
+        }
+        else
+        {
+            settings.HideHasRequiredMaterialItems = false;
+            updateQueued = true;
+        }
+        if (updateQueued)
+        {
+            Task.Run(() => _settingsService.UpdateAsync(settings));
+        }
     }
 
     #region Messages
@@ -246,7 +391,7 @@ public partial class WorldViewModel : ViewModelBase
 
         Messenger.Register<WorldViewModel, SaveFileChangedMessage>(this, (r, m) => {
             IsLoading = true;
-            Task.Run(async () => await ReadSave(m.CharacterCountChanged));
+            Task.Run(async () => await SaveFileChangedHandler(m.CharacterCountChanged));
         });
     }
     #endregion Messages

@@ -15,10 +15,11 @@ This tool only **reads** the save file, it can not make any changes to it.
 - Displays the items that are available in the current rolled world
 - Displays the current location of the player
 - Indicates whether Trait book and/or Simulacrum are available in the location
-- Displays Bloodmoon status
+- ~~Displays Bloodmoon status~~ Temporarily doesn't
 - Displays whether an item is only obtainable in co-op
 - Allows to filter by item names and injectable events
 - Updates the state whenever the save file changes
+- Gamepass support
 - ... and more?
 
 # Installation
@@ -33,3 +34,6 @@ This tool only **reads** the save file, it can not make any changes to it.
 - AndrewSav for [https://github.com/AndrewSav/lib.remnant2.analyzer](https://github.com/AndrewSav/lib.remnant2.analyzer), which is used as an underlying parsing library
 - Avalonia (EN) telegram channel and specifically Steve for answering many of my AvaloniaUI-related questions
 - And you! For taking an interest in the project
+
+# Known issues
+- When viewing a big list of items application is stuttering on refresh. This is due to my control of choice (treeview) not having virtualization, so building a visual tree takes a while. I learned about this quite late in development, so I decided to stick with it for now. I will try to optimize it when I have extra time (this will require a non-trivial rework)

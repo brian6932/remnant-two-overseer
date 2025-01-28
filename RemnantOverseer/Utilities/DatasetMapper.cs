@@ -27,16 +27,7 @@ internal class DatasetMapper
         var result = new MappedCharacters();
         foreach (var character in characters)
         {
-            var mappedCharacter = new Models.Character();
-            mappedCharacter.Index = character.Index;
-            mappedCharacter.Archetype = Enum.Parse<Archetypes>(character.Profile.Archetype);
-            mappedCharacter.SubArchetype = Enum.Parse<Archetypes>(character.Profile.SecondaryArchetype);
-            mappedCharacter.ObjectCount = character.Profile.AcquiredItems;
-            mappedCharacter.PowerLevel = character.Profile.ItemLevel; // Yes.
-            mappedCharacter.ActiveWorld = Enum.Parse<WorldTypes>(character.ActiveWorldSlot.ToString(), true);
-            mappedCharacter.IsHardcore = character.Profile.IsHardcore;
-            mappedCharacter.Playtime = character.Save.Playtime ?? TimeSpan.Zero;
-
+            var mappedCharacter = MapCharacter(character);
             result.CharacterList.Add(mappedCharacter);
         }
 
@@ -46,17 +37,39 @@ internal class DatasetMapper
         return result;
     }
 
+    public static Models.Character MapCharacter(Character character)
+    {
+        Enum.TryParse<Archetypes>(character.Profile.Archetype, true, out var archetype); // If false, will default to default value in enum, i.e. Unknown
+        Enum.TryParse<Archetypes>(character.Profile.SecondaryArchetype, true, out var subarchetype);
+        return new Models.Character
+        {
+            Index = character.Index,
+            Archetype = archetype,
+            SubArchetype = string.IsNullOrEmpty(character.Profile.SecondaryArchetype) ? null : subarchetype,
+            ObjectCount = character.Profile.AcquiredItems,
+            PowerLevel = character.Profile.ItemLevel, // Yes.
+            ActiveWorld = Enum.Parse<WorldTypes>(character.ActiveWorldSlot.ToString(), true),
+            IsHardcore = character.Profile.IsHardcore,
+            Playtime = character.Save.Playtime ?? TimeSpan.Zero
+        };
+    }
+
     public static MappedMissingItems MapMissingItems(List<Dictionary<string, string>> missingItemsDict)
     {
         var result = new MappedMissingItems();
         foreach(var missingItem in missingItemsDict)
         {
-            var lootItem = new LootItem() { Properties = missingItem };
+            var lootItem = new LootItemExtended() { Properties = missingItem };
             var item = MapLootItemToItem(lootItem);
             result.ItemCategoryList[(int)item.Type].Items.Add(item);
         }
 
         return result;
+    }
+
+    public static int GetActiveCharacterIndex(Dataset dataset)
+    {
+        return dataset.Characters.Count <= dataset.ActiveCharacterIndex ? 0 : dataset.ActiveCharacterIndex;
     }
 
     private static List<Models.Zone> MapZonesToZones(List<Zone> zones, List<string> missingItemIds, RespawnPoint? respawnPoint)
@@ -138,7 +151,7 @@ internal class DatasetMapper
         return result;
     }
 
-    private static Models.Item MapLootItemToItem(LootItem lootItem)
+    private static Models.Item MapLootItemToItem(LootItemExtended lootItem)
     {
         Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
         var itemModel = new Models.Item
@@ -147,14 +160,17 @@ internal class DatasetMapper
             Name = lootItem.Name,
             Description = lootItem.ItemNotes,
             IsLooted = lootItem.IsLooted,
+            IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
+            HasRequiredMaterial = lootItem.HasRequiredMaterial,
             Type = itemType,
-            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
+            IsAccountAward = lootItem.IsVendoredAccountAward
         };
 
         return itemModel;
     }
 
-    private static Models.Item MapLootItemToItem(LootItem lootItem, LootGroup lootGroup, bool isDuplicate)
+    private static Models.Item MapLootItemToItem(LootItemExtended lootItem, LootGroup lootGroup, bool isDuplicate)
     {
         Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
         Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
@@ -164,12 +180,15 @@ internal class DatasetMapper
             Name = lootItem.Name,
             Description = lootItem.ItemNotes,
             IsLooted = lootItem.IsLooted,
+            IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
             Type = itemType,
             OriginType = originType,
             OriginName = lootGroup.Name ?? string.Empty,
 
             IsDuplicate = isDuplicate,
-            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True"
+            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
+            IsAccountAward = lootItem.IsVendoredAccountAward
+            
         };
 
         return itemModel;

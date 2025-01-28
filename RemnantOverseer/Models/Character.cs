@@ -16,6 +16,16 @@ public partial class Character: ObservableObject
 
     public string? FormattedPlaytime => (int)Playtime.TotalHours + Playtime.ToString(@"\:mm\:ss");
 
+    public string FormattedPowerLevel => PowerLevel > 0 ? PowerLevel.ToString() : "?";
+
+    public string? Summary
+    {
+        get
+        {
+            return SubArchetype == null ? $"{Archetype} :: Level {FormattedPowerLevel}" : $"{Archetype}/{SubArchetype} :: Level {FormattedPowerLevel}";
+        }
+    }
+
     // Viewmodel specific
     [ObservableProperty]
     private bool _isSelected;
