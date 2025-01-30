@@ -66,7 +66,7 @@ public partial class WorldViewModel : ViewModelBase
         _filterTextSubject
           .Throttle(TimeSpan.FromMilliseconds(400))
           .Subscribe(OnFilterTextChangedDebounced);
-        ApplySettings();
+        ApplySettingsOnInit();
 
         // Set the flag until after onLoaded is executed
         IsLoading = true;
@@ -332,13 +332,14 @@ public partial class WorldViewModel : ViewModelBase
         HideHasRequiredMaterialItems = false;
     }
 
-    private void ApplySettings()
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+    private void ApplySettingsOnInit()
     {
         var updateQueued = false;
         var settings = _settingsService.Get();
         if (settings.HideDuplicates.HasValue)
         {
-            HideDuplicates = settings.HideDuplicates.Value;
+            _hideDuplicates = settings.HideDuplicates.Value;
         }
         else
         {
@@ -347,7 +348,7 @@ public partial class WorldViewModel : ViewModelBase
         }
         if (settings.HideLootedItems.HasValue)
         {
-            HideLootedItems = settings.HideLootedItems.Value;
+            _hideLootedItems = settings.HideLootedItems.Value;
         }
         else
         {
@@ -356,7 +357,7 @@ public partial class WorldViewModel : ViewModelBase
         }
         if (settings.HideMissingPrerequisiteItems.HasValue)
         {
-            HideMissingPrerequisiteItems = settings.HideMissingPrerequisiteItems.Value;
+            _hideMissingPrerequisiteItems = settings.HideMissingPrerequisiteItems.Value;
         }
         else
         {
@@ -365,7 +366,7 @@ public partial class WorldViewModel : ViewModelBase
         }
         if (settings.HideHasRequiredMaterialItems.HasValue)
         {
-            HideHasRequiredMaterialItems = settings.HideHasRequiredMaterialItems.Value;
+            _hideHasRequiredMaterialItems = settings.HideHasRequiredMaterialItems.Value;
         }
         else
         {
@@ -377,6 +378,7 @@ public partial class WorldViewModel : ViewModelBase
             Task.Run(() => _settingsService.UpdateAsync(settings));
         }
     }
+#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
     #region Messages
     protected override void OnActivated()
