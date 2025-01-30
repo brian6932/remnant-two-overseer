@@ -173,6 +173,26 @@
               <Setter Property="Foreground" Value="{StaticResource BaseTextDisabledColor}" />
               <Setter Property="Opacity" Value="0.5" />
             </Style>
+            <Style Selector="Button.hint">
+              <Setter Property="Height" Value="{StaticResource IconSize}" />
+              <Setter Property="Width" Value="{StaticResource IconSize}" />
+              <Setter Property="Opacity" Value="0.5" />
+              <Setter Property="Background" Value="Transparent" />
+              <Style Selector="^:pointerover">
+                <Setter Property="Opacity" Value="1" />
+              </Style>
+              <Style Selector="^:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+              </Style>
+              <Style Selector="^:pressed /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+              </Style>
+              <Setter Property="Transitions">
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.125" />
+                </Transitions>
+              </Setter>
+            </Style>
           </TreeView.Styles>
           <TreeView.DataTemplates>
             <TreeDataTemplate DataType="models:Zone" ItemsSource="{Binding Locations}">
@@ -193,6 +213,11 @@
                   <PathIcon Grid.Column="1" Data="{StaticResource SimulacrumIcon2}" IsVisible="{Binding IsSimulacrumPresent}" IsEnabled="{Binding !IsSimulacrumLooted}" ToolTip.Tip="Simulacrum Available" Margin="5 0"/>
                   <!--<PathIcon Grid.Column="2" Data="{StaticResource BloodmoonIcon}" IsVisible="{Binding IsBloodmoon}" Foreground="{StaticResource BaseAccentColor}" ToolTip.Tip="Bloodmoon altar present" Margin="5 0"/>-->
                   <PathIcon Grid.Column="2" Data="{StaticResource CurrentLocationIcon}" IsVisible="{Binding IsRespawnLocation}" Foreground="{StaticResource ZoneTransitionColor}" ToolTip.Tip="{Binding FormattedRespawnPointName}" Margin="5 0"/>
+                  
+                  <!-- Hints -->
+                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Genesis" IsVisible="{Binding IsGenesisLocation}" Click="GenesisHintButton_Click">
+                    <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource RequiredGlyphColor}"/>
+                  </Button>
                 </Grid>
               </Grid>
             </TreeDataTemplate>

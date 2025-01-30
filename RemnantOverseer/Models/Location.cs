@@ -36,6 +36,8 @@ public class Location
         return $"Transition between {split[0]} and {split[1]}";
     }
 
+    public bool IsGenesisLocation => Name.Equals("Withered Necropolis");
+
 
     public Location ShallowCopy()
     {
