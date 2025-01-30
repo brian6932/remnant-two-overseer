@@ -1,6 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using RemnantOverseer.Services;
 
 // Credit to the detectives on reddit and elsewhere that made this possible
 // https://www.reddit.com/r/remnantgame/comments/1g4b01z/how_we_actually_solved_the_genesis_puzzle/
@@ -14,9 +16,19 @@ public partial class GenesisTipViewModel: ViewModelBase, IDisposable
 
     private CancellationTokenSource _cancellationTokenSource { get; set; }
 
+    [ObservableProperty]
+    private int[] _currentGlyphs;
+
+    [ObservableProperty]
+    private int[] _requiredGlyphs;
+
+#pragma warning disable CS8618
     public GenesisTipViewModel()
+#pragma warning restore CS8618
     {
         _cancellationTokenSource = new CancellationTokenSource();
+        SetSymbols();
+        Task.Run(async () => { await WaitForUpdate(_cancellationTokenSource.Token); }); 
     }
 
     public void Dispose()
@@ -28,17 +40,15 @@ public partial class GenesisTipViewModel: ViewModelBase, IDisposable
     {
         var current = DateTime.UtcNow.Ticks;
         var next = DateTime.UtcNow.AddHours(1).Ticks;
-        var currentSymbols = GetCode(current);
-        var nextSymbols = GetCode(next);
-        Console.WriteLine(currentSymbols);
-        Console.WriteLine(nextSymbols);
+        CurrentGlyphs = GetCode(current);
+        RequiredGlyphs = GetCode(next);
     }
 
     private int[] GetCode(long time)
     {
         var hoursSinceRelease = (int)Math.Floor((decimal)(time - _releaseDate) / ((long)3600 * 1000 * 10000));
         var offsetIndex = hoursSinceRelease % 8;
-        int code = hoursSinceRelease * _cardID + _offsets[offsetIndex]; // Overflow bros... it is our time
+        int code = hoursSinceRelease * _cardID + _offsets[offsetIndex];
         var result = new int[4];
         for (int j = 3; j >= 0; j--)
         {
@@ -51,9 +61,19 @@ public partial class GenesisTipViewModel: ViewModelBase, IDisposable
 
     private async Task WaitForUpdate(CancellationToken cancellationToken)
     {
-        var time = DateTime.Now.Minute;
-        var span = TimeSpan.FromMinutes(60 - time);
-        await Task.Delay(span, cancellationToken);
+        var time = DateTime.Now.Minute*60 + DateTime.Now.Second;
+        var span = TimeSpan.FromSeconds(3600 - time);
+        try
+        {
+            Log.Instance.Information($"{nameof(GenesisTipViewModel)} started waiting for {span}");
+            await Task.Delay(span, cancellationToken);
+        }
+        catch
+        {
+            Log.Instance.Information($"{nameof(GenesisTipViewModel)} cancelled waiting");
+            return;
+        }
         SetSymbols();
+        _ = Task.Run(async () => { await WaitForUpdate(cancellationToken); });
     }
 }

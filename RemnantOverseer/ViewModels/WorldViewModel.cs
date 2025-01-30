@@ -19,10 +19,9 @@ public partial class WorldViewModel : ViewModelBase
 {
     private readonly SettingsService _settingsService;
     private readonly SaveDataService _saveDataService;
-
     private MappedZones _mappedZones = new();
-
     private int _selectedCharacterIndex = -1;
+    private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
     [ObservableProperty]
     private ObservableCollection<Zone> _filteredZones = [];
@@ -59,8 +58,6 @@ public partial class WorldViewModel : ViewModelBase
 
     [ObservableProperty]
     private string? _filterText = null;
-
-    private readonly Subject<string?> _filterTextSubject = new Subject<string?>();
 
     public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {

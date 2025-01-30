@@ -15,6 +15,7 @@
         <ResourceInclude Source="/Styles/BaseColorsPalette.axaml"/>
         <ResourceInclude Source="/Styles/BaseResources.axaml" />
         <ResourceInclude Source="/Styles/IconResources.axaml" />
+        <ResourceInclude Source="/Styles/GenesisGlyphs.axaml" />
         
         <ResourceInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml" />
         

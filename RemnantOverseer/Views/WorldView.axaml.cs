@@ -34,4 +34,14 @@ public partial class WorldView : UserControl
             FlyoutBase.ShowAttachedFlyout(control);
         }
     }
+
+    private void GenesisHintButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var flyout = new Flyout
+        {
+            Content = new GenesisTipViewModel(),
+            Placement = PlacementMode.Center
+        };
+        flyout.ShowAt(ContentGrid);
+    }
 }
