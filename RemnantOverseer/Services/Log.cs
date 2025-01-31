@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using Avalonia.Controls;
+using Serilog;
+using Serilog.Core;
 using Serilog.Templates;
 using System;
 using System.IO;
@@ -10,6 +12,7 @@ internal class Log
     public const string LogFileName = "log.txt";
     public static string LogFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LogFileName);
 
+    private static Logger? _disposableLogger;
     private static ILogger? _instance;
     public static ILogger Instance
     {
@@ -26,12 +29,27 @@ internal class Log
         {
             File.Delete(LogFilePath);
         }
-        LoggerConfiguration config = new LoggerConfiguration()
-            .WriteTo.File(template, LogFilePath);
 
-        _instance = config.CreateLogger().ForContext<Program>();
+        LoggerConfiguration config;
+        if (Design.IsDesignMode)
+        {
+            config = new LoggerConfiguration();
+        }
+        else
+        {
+            config = new LoggerConfiguration()
+            .WriteTo.File(template, LogFilePath);
+        }
+
+        _disposableLogger = config.CreateLogger();
+        _instance = _disposableLogger.ForContext<Program>();
         Instance.Information($"Version {Assembly.GetExecutingAssembly().GetName().Version}");
         lib.remnant2.analyzer.Log.Logger = Instance;
         lib.remnant2.saves.Log.Logger = Instance;
+    }
+
+    public static void Dispose()
+    {
+        _disposableLogger?.Dispose();
     }
 }

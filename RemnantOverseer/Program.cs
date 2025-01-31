@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using RemnantOverseer.Services;
 using RemnantOverseer.Utilities;
 using System;
 using System.Threading;
@@ -20,6 +21,7 @@ internal sealed class Program
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
             mutex.ReleaseMutex();
+            Log.Dispose();
         }
         else
         {
