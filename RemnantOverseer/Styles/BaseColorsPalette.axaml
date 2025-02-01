@@ -24,4 +24,7 @@
   <Color x:Key="RequiredGlyphColor">#9f87d0</Color>
   <Color x:Key="CurrentGlyphColor">#b3a3d2</Color>
   <Color x:Key="GlyphGlowColor">#cec7dd</Color>
+  
+  <!-- Tree -->
+  <Color x:Key="ThaenFruitColor">#e4ab3b</Color>
 </ResourceDictionary>

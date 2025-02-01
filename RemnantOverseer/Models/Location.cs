@@ -37,6 +37,7 @@ public class Location
     }
 
     public bool IsGenesisLocation => Name.Equals("Withered Necropolis");
+    public bool IsWard13Location => Name.Equals("Ward 13");
 
 
     public Location ShallowCopy()

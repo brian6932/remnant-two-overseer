@@ -72,6 +72,17 @@ internal class DatasetMapper
         return dataset.Characters.Count <= dataset.ActiveCharacterIndex ? 0 : dataset.ActiveCharacterIndex;
     }
 
+    public static Models.ThaenTree? MapThaenTree(Character character)
+    {
+        return character.Save.ThaenFruit is null ? null : new Models.ThaenTree()
+        {
+            GrowthStage = character.Save.ThaenFruit.GrowthStage,
+            Timestamp = character.Save.ThaenFruit.Timestamp,
+            HasFruit = character.Save.ThaenFruit.HasFruit,
+            PickedCount = character.Save.ThaenFruit.PickedCount
+        };
+    }
+
     private static List<Models.Zone> MapZonesToZones(List<Zone> zones, List<string> missingItemIds, RespawnPoint? respawnPoint)
     {
         //var locnames = new List<string>();

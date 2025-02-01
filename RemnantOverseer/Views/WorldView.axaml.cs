@@ -44,4 +44,14 @@ public partial class WorldView : UserControl
         };
         flyout.ShowAt(ContentGrid);
     }
+
+    private void ThaenHintButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var flyout = new Flyout
+        {
+            Content = new ThaenProgressViewModel(((WorldViewModel)DataContext!).ThaenTree),
+            Placement = PlacementMode.Center
+        };
+        flyout.ShowAt(ContentGrid);
+    }
 }

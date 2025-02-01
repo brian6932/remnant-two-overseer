@@ -59,6 +59,9 @@ public partial class WorldViewModel : ViewModelBase
     [ObservableProperty]
     private string? _filterText = null;
 
+    [ObservableProperty]
+    private ThaenTree? _thaenTree;
+
     public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
         _settingsService = settingsService;
@@ -293,6 +296,8 @@ public partial class WorldViewModel : ViewModelBase
             }
         }
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+
+        ThaenTree = DatasetMapper.MapThaenTree(dataset.Characters[_selectedCharacterIndex]);
 
         ApplyFilter();
 

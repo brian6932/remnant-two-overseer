@@ -218,6 +218,9 @@
                   <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Genesis" IsVisible="{Binding IsGenesisLocation}" Click="GenesisHintButton_Click">
                     <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource RequiredGlyphColor}"/>
                   </Button>
+                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Thaen Tree" IsVisible="{Binding IsWard13Location}" Click="ThaenHintButton_Click">
+                    <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource ThaenFruitColor}"/>
+                  </Button>
                 </Grid>
               </Grid>
             </TreeDataTemplate>

@@ -38,7 +38,7 @@ internal class Log
         else
         {
             config = new LoggerConfiguration()
-            .WriteTo.File(template, LogFilePath);
+                .WriteTo.File(template, LogFilePath);
         }
 
         _disposableLogger = config.CreateLogger();
