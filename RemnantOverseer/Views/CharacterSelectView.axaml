@@ -153,7 +153,7 @@
                     <TextBlock Grid.Row="1" Text="{Binding SubArchetype}" Margin="0 3 0 0" IsVisible="{Binding SubArchetype, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                     <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0 3 0 0" HorizontalAlignment="Center">
                       <PathIcon Data="{StaticResource PlaytimeIcon}" Height="12" Width="12" Margin="3 0" />
-                      <TextBlock Text="{Binding FormattedPlaytime}" FontFeatures="tnum"/>
+                      <TextBlock Text="{Binding FormattedPlaytime}"/>
                     </StackPanel>
                   </Grid>
 
