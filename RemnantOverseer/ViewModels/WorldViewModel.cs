@@ -63,10 +63,10 @@ public partial class WorldViewModel : ViewModelBase
     private ThaenTree? _thaenTree;
 
     [ObservableProperty]
-    private bool _hideTips;
+    private bool _hideTips = false;
 
     [ObservableProperty]
-    private bool _hideToolkitLinks;
+    private bool _hideToolkitLinks = false;
 
     public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
@@ -384,6 +384,16 @@ public partial class WorldViewModel : ViewModelBase
             settings.HideHasRequiredMaterialItems = false;
             updateQueued = true;
         }
+
+        if (settings.HideTips.HasValue)
+        {
+            _hideTips = settings.HideTips.Value;
+        }
+        if (settings.HideToolkitLinks.HasValue)
+        {
+            _hideToolkitLinks = settings.HideToolkitLinks.Value;
+        }
+
         if (updateQueued)
         {
             Task.Run(() => _settingsService.UpdateAsync(settings));
