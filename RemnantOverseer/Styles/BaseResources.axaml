@@ -10,5 +10,6 @@
   <SolidColorBrush x:Key="BaseAccentHighBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.8" />
   <SolidColorBrush x:Key="BaseAccentMediumBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.6" />
   <SolidColorBrush x:Key="BaseAccentLowBrush" Color="{StaticResource BaseAccentColor}" Opacity="0.4" />
+  <SolidColorBrush x:Key="BaseAccentTransparentBrush" Color="{StaticResource BaseAccentColor}" Opacity="0" />
 
 </ResourceDictionary>

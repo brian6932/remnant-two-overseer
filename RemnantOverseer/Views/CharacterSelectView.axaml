@@ -171,10 +171,12 @@
                   </Style>
                 </Border.Styles>
               </Border>
-              <Border Name="OuterBorder" BorderThickness="3" CornerRadius="12" Background="{x:Null}">
+              <Border Name="OuterBorder" BorderThickness="3" Background="{x:Null}"
+                      CornerRadius="{Binding, Converter={StaticResource DoubleToCornerRadiusConverter}, ConverterParameter={StaticResource OuterBorderRadiusValue}}">
                 <Border.Styles>
                   <Style Selector="ListBoxItem Border#OuterBorder" >
                     <Setter Property="BorderBrush" Value="{StaticResource OuterBorderInactiveBrush}" />
+                    <Setter Property="BoxShadow" Value="0 0 0 0 #00c3c3c3" />
                   </Style>
                   <Style Selector="ListBoxItem:pointerover Border#OuterBorder">
                     <Setter Property="BorderBrush" Value="{StaticResource OuterBorderBrush}" />
@@ -185,6 +187,13 @@
                     <Setter Property="BoxShadow" Value="0 0 4 2 #c3c3c3" />
                   </Style>
                 </Border.Styles>
+
+                <Border.Transitions>
+                  <Transitions>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.25" Easing="SineEaseOut"/>
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.25" Easing="SineEaseOut"/>
+                  </Transitions>
+                </Border.Transitions>
               </Border>
             </Panel>
           </ToggleButton>
