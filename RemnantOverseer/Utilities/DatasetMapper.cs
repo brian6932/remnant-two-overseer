@@ -86,6 +86,7 @@ internal class DatasetMapper
     private static List<Models.Zone> MapZonesToZones(List<Zone> zones, List<string> missingItemIds, RespawnPoint? respawnPoint)
     {
         //var locnames = new List<string>();
+        //var subtypes = new List<string>();
 
         var result = new List<Models.Zone>();
         foreach (var zone in zones)
@@ -120,6 +121,10 @@ internal class DatasetMapper
                 {
                     foreach (var item in lootGroup.Items)
                     {
+                        //if (item.Properties.TryGetValue("Subtype", out string? value) && !subtypes.Contains(value))
+                        //{
+                        //    subtypes.Add(value);
+                        //}
                         var itemModel = MapLootItemToItem(item, lootGroup, !missingItemIds.Contains(item.Id));
                         locationModel.Items.Add(itemModel);
                     }
@@ -159,6 +164,7 @@ internal class DatasetMapper
         }
 
         //var t = locnames;
+        //var s = subtypes;
         return result;
     }
 
@@ -183,24 +189,17 @@ internal class DatasetMapper
 
     private static Models.Item MapLootItemToItem(LootItemExtended lootItem, LootGroup lootGroup, bool isDuplicate)
     {
-        Enum.TryParse<ItemTypes>(lootItem.Type.Replace("_", ""), true, out var itemType); // If false, will default to default value in enum, aka Unknown
-        Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
-        var itemModel = new Models.Item
-        {
-            Id = lootItem.Id,
-            Name = lootItem.Name,
-            Description = lootItem.ItemNotes,
-            IsLooted = lootItem.IsLooted,
-            IsPrerequisiteMissing = lootItem.IsPrerequisiteMissing,
-            Type = itemType,
-            OriginType = originType,
-            OriginName = lootGroup.Name ?? string.Empty,
+        var itemModel = MapLootItemToItem(lootItem);
 
-            IsDuplicate = isDuplicate,
-            IsCoop = lootItem.Properties.ContainsKey("Coop") && lootItem.Properties["Coop"] == "True",
-            IsAccountAward = lootItem.IsVendoredAccountAward
-            
-        };
+        Enum.TryParse<OriginTypes>(lootGroup.Type.Replace(" ", ""), true, out var originType);
+        itemModel.OriginType = originType;
+        itemModel.OriginName = lootGroup.Name ?? string.Empty;
+        itemModel.IsDuplicate = isDuplicate;
+
+        if(itemModel.Type == ItemTypes.Weapon)
+        {
+            itemModel.WeaponSubtype = WeaponSubtypesExtensions.FromFriendlyString(lootItem.Properties["Subtype"]);
+        }
 
         return itemModel;
     }

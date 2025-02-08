@@ -7,4 +7,23 @@
   </Design.PreviewWith>
 
   <!-- Add Styles Here -->
+  <Style Selector="HyperlinkButton.plain">
+    <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+    <Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+    <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+    </Style>
+    <Style Selector="^:visited">
+      <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+      </Style>
+      <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource BaseTextColor}" />
+      </Style>
+    </Style>
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
 </Styles>

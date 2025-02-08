@@ -1,4 +1,6 @@
 ﻿using RemnantOverseer.Models.Enums;
+using RemnantOverseer.Utilities;
+using System;
 
 namespace RemnantOverseer.Models;
 public class Item
@@ -6,6 +8,7 @@ public class Item
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public ItemTypes Type { get; set; }
+    public WeaponSubtypes? WeaponSubtype { get; set; }
     public string Description { get; set; } = string.Empty;
     public OriginTypes OriginType { get; set; }
     public string OriginName { get; set; } = string.Empty;
@@ -32,10 +35,40 @@ public class Item
         }
     }
 
-    public string? WikiLink => $"https://remnant.wiki/{Name}";
+    public string? WikiLink => $"{UrlStrings.WikiUrl}/{Name}";
+
+    public string? ToolkitLink => GetToolkitLink();
 
     public Item ShallowCopy()
     {
         return (Item)MemberwiseClone();
+    }
+
+    private string? GetToolkitLink()
+    {
+        var querySubstring = "";
+        switch (Type)
+        {
+            case ItemTypes.Amulet:
+                querySubstring = "amulets";
+                break;
+            case ItemTypes.Ring:
+                querySubstring = "rings";
+                break;
+            case ItemTypes.Weapon:
+                if (WeaponSubtype == null) return null;
+                querySubstring = WeaponSubtype switch
+                {
+                    WeaponSubtypes.LongGun => "longGuns",
+                    WeaponSubtypes.HandGun => "handGuns",
+                    WeaponSubtypes.MeleeWeapon => "melees",
+                    _ => throw new NotImplementedException()
+                };
+                break;
+            default:
+                return null;
+        }
+        var itemName = Name.Replace(" ", "+");
+        return $"{UrlStrings.ToolkitUrl}?{querySubstring}={itemName}";
     }
 }
