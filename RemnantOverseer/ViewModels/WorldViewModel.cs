@@ -62,6 +62,12 @@ public partial class WorldViewModel : ViewModelBase
     [ObservableProperty]
     private ThaenTree? _thaenTree;
 
+    [ObservableProperty]
+    private bool _hideTips;
+
+    [ObservableProperty]
+    private bool _hideToolkitLinks;
+
     public WorldViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
         _settingsService = settingsService;
@@ -396,6 +402,14 @@ public partial class WorldViewModel : ViewModelBase
         Messenger.Register<WorldViewModel, SaveFileChangedMessage>(this, (r, m) => {
             IsLoading = true;
             Task.Run(async () => await SaveFileChangedHandler(m.CharacterCountChanged));
+        });
+
+        Messenger.Register<WorldViewModel, HideTipsChangedMessage>(this, (r, m) => {
+            HideTips = m.Value;
+        });
+
+        Messenger.Register<WorldViewModel, HideToolkitLinksChangedMessage>(this, (r, m) => {
+            HideToolkitLinks = m.Value;
         });
     }
     #endregion Messages

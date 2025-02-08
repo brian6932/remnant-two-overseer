@@ -27,7 +27,17 @@
             </Grid>
           </Grid>
 
-          <Separator Grid.Row="1" Background="{StaticResource OuterBorderInactiveColor}" Height="2" Margin="0 15 0 0"/>
+          <Separator Background="{StaticResource OuterBorderInactiveColor}" Height="2" Margin="0 15 0 0"/>
+          
+          <!-- Toggles -->
+          <CheckBox IsChecked="{Binding !HideTips}"
+                    Command="{Binding UpdateHideTipsCommand}"
+                    Content="Enable location-specific hints" Margin="0 15 0 0"/>
+          <CheckBox IsChecked="{Binding !HideToolkitLinks}"
+                    Command="{Binding UpdateHideToolkitLinksCommand}"
+                    Content="Display links to Remnant Toolkit for applicable items" />
+          
+          <Separator Background="{StaticResource OuterBorderInactiveColor}" Height="2" Margin="0 15 0 0"/>
 
           <!-- Logging -->
           <Grid RowDefinitions="Auto, Auto" Margin="0 20 0 0">

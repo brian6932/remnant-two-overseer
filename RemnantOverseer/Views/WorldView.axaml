@@ -217,10 +217,22 @@
                   <PathIcon Grid.Column="2" Data="{StaticResource CurrentLocationIcon}" IsVisible="{Binding IsRespawnLocation}" Foreground="{StaticResource ZoneTransitionColor}" ToolTip.Tip="{Binding FormattedRespawnPointName}" Margin="5 0"/>
                   
                   <!-- Hints -->
-                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Genesis" IsVisible="{Binding IsGenesisLocation}" Click="GenesisHintButton_Click">
+                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Genesis" Click="GenesisHintButton_Click">
+                    <Button.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsGenesisLocation" Mode="OneWay" />
+                        <Binding Path="!$parent[TreeView].((vm:WorldViewModel)DataContext).HideTips" Mode="OneWay" />
+                      </MultiBinding>
+                    </Button.IsVisible>
                     <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource RequiredGlyphColor}"/>
                   </Button>
-                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Thaen Tree" IsVisible="{Binding IsWard13Location}" Click="ThaenHintButton_Click">
+                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Thaen Tree" Click="ThaenHintButton_Click">
+                    <Button.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsWard13Location" Mode="OneWay" />
+                        <Binding Path="!$parent[TreeView].((vm:WorldViewModel)DataContext).HideTips" Mode="OneWay" />
+                      </MultiBinding>
+                    </Button.IsVisible>
                     <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource ThaenFruitColor}"/>
                   </Button>
                 </Grid>
@@ -291,8 +303,13 @@
                   <!-- consider always showing icons, but very faint if not applicable for layout consistency -->
                   <!--<PathIcon Height="{StaticResource IconSize}" Width="{StaticResource IconSize}" Margin="5 0" Foreground="{StaticResource BaseTextColor}" Data="{StaticResource CoopIcon}"/>-->
                   <PathIcon Data="{StaticResource RoundInfoIcon}" IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" ToolTip.Tip="{Binding Description}" ToolTip.Placement="LeftEdgeAlignedTop"/>
-                  <HyperlinkButton Classes="plain" Margin="5 0" Padding="0" NavigateUri="{Binding ToolkitLink}"
-                                   IsVisible="{Binding ToolkitLink, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <HyperlinkButton Classes="plain" Margin="5 0" Padding="0" NavigateUri="{Binding ToolkitLink}">
+                    <HyperlinkButton.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="ToolkitLink" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" Mode="OneWay" />
+                        <Binding Path="!$parent[TreeView].((vm:WorldViewModel)DataContext).HideToolkitLinks" Mode="OneWay" />
+                      </MultiBinding>
+                    </HyperlinkButton.IsVisible>
                     <Image Source="{StaticResource ToolkitImg}" Height="20" Width="20" RenderOptions.BitmapInterpolationMode="MediumQuality">
                     </Image>
                     <ToolTip.Placement>LeftEdgeAlignedTop</ToolTip.Placement>

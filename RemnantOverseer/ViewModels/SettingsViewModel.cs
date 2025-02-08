@@ -18,13 +18,22 @@ public partial class SettingsViewModel: ViewModelBase
     [ObservableProperty]
     private string? _filePath;
 
+    [ObservableProperty]
+    private bool _hideTips;
+
+    [ObservableProperty]
+    private bool _hideToolkitLinks;
+
     public SettingsViewModel(SettingsService settingsService, SaveDataService saveDataService)
     {
         _settingsService = settingsService;
         _saveDataService = saveDataService;
-        FilePath = _settingsService.Get()?.SaveFilePath ?? null;
+        var settings = _settingsService.Get();
+        FilePath = settings?.SaveFilePath ?? null;
+        HideTips = settings?.HideTips ?? false;
+        HideToolkitLinks = settings?.HideToolkitLinks ?? false;
 
-        if(Design.IsDesignMode)
+        if (Design.IsDesignMode)
         {
             FilePath = @"C:\Remnant\Remnant 2: I'm Beginning to Remn";
         }
@@ -92,6 +101,32 @@ public partial class SettingsViewModel: ViewModelBase
     public async Task ExportSave()
     {
         await Task.Run(_saveDataService.ExportSave);
+    }
+
+    [RelayCommand]
+    public async Task UpdateHideTips()
+    {
+        await Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideTips = HideTips;
+            await _settingsService.UpdateAsync(settings);
+
+            WeakReferenceMessenger.Default.Send(new HideTipsChangedMessage(HideTips));
+        });
+    }
+
+    [RelayCommand]
+    public async Task UpdateHideToolkitLinks()
+    {
+        await Task.Run(async () =>
+        {
+            var settings = _settingsService.Get();
+            settings.HideToolkitLinks = HideToolkitLinks;
+            await _settingsService.UpdateAsync(settings);
+
+            WeakReferenceMessenger.Default.Send(new HideToolkitLinksChangedMessage(HideToolkitLinks));
+        });
     }
 
     public static FilePickerFileType Saves { get; } = new("Remnant 2 save files")

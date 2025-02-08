@@ -6,4 +6,6 @@ public class Settings
     public bool? HideLootedItems { get; set; }
     public bool? HideMissingPrerequisiteItems { get; set; }
     public bool? HideHasRequiredMaterialItems { get; set; }
+    public bool? HideTips { get; set; }
+    public bool? HideToolkitLinks { get; set; }
 }
