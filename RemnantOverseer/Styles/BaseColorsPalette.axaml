@@ -27,4 +27,7 @@
   
   <!-- Tree -->
   <Color x:Key="ThaenFruitColor">#e4ab3b</Color>
+  
+  <!-- Quilt -->
+  <Color x:Key="QuiltBorderColor">#a68749</Color>
 </ResourceDictionary>

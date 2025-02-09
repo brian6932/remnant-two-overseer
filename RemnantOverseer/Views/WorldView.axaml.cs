@@ -54,4 +54,14 @@ public partial class WorldView : UserControl
         };
         flyout.ShowAt(ContentGrid);
     }
+
+    private void QuiltHintButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var flyout = new Flyout
+        {
+            Content = new PatchworkQuiltViewModel(((WorldViewModel)DataContext!).CompletedQuests),
+            Placement = PlacementMode.Center
+        };
+        flyout.ShowAt(ContentGrid);
+    }
 }

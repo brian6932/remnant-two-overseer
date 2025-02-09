@@ -235,6 +235,15 @@
                     </Button.IsVisible>
                     <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource ThaenFruitColor}"/>
                   </Button>
+                  <Button Classes="hint" Grid.Column="3" Margin="5 0" ToolTip.Tip="Hint: Oracle's Quilt" Click="QuiltHintButton_Click">
+                    <Button.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsOracleLocation" Mode="OneWay" />
+                        <Binding Path="!$parent[TreeView].((vm:WorldViewModel)DataContext).HideTips" Mode="OneWay" />
+                      </MultiBinding>
+                    </Button.IsVisible>
+                    <PathIcon Data="{StaticResource LocationSecretIcon}" Foreground="{StaticResource QuiltBorderColor}"/>
+                  </Button>
                 </Grid>
               </Grid>
             </TreeDataTemplate>

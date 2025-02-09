@@ -65,6 +65,10 @@ public class SettingsService
 
     public void Update(Settings settings)
     {
+        if (settings.SaveFilePath == null)
+        {
+            ;
+        }
         try
         {
             var json = JsonSerializer.Serialize(settings, options: _options);
@@ -84,6 +88,10 @@ public class SettingsService
 
     public async Task UpdateAsync(Settings settings)
     {
+        if (settings.SaveFilePath == null)
+        {
+            ;
+        }
         await _semaphore.WaitAsync();
         try
         {

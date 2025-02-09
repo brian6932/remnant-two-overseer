@@ -10,7 +10,6 @@ internal class DatasetMapper
     public static MappedZones MapCharacterToZones(Character characterData)
     {
         var missingItemIds = characterData.Profile.MissingItems.Select(x => x["Id"]).ToList();
-
         var result = new MappedZones
         {
             CampaignZoneList = MapZonesToZones([.. characterData.Save.Campaign.Zones, characterData.Save.Campaign.Ward13], missingItemIds, characterData.Save.Campaign.RespawnPoint)
@@ -126,6 +125,7 @@ internal class DatasetMapper
                         //    subtypes.Add(value);
                         //}
                         var itemModel = MapLootItemToItem(item, lootGroup, !missingItemIds.Contains(item.Id));
+                        // if (itemModel.OriginName.Equals("Oracle's Refuge")) locationModel.IsOracleLocation = true;
                         locationModel.Items.Add(itemModel);
                     }
                 }

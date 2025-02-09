@@ -63,6 +63,9 @@ public partial class WorldViewModel : ViewModelBase
     private ThaenTree? _thaenTree;
 
     [ObservableProperty]
+    private List<string> _completedQuests = [];
+
+    [ObservableProperty]
     private bool _hideTips = false;
 
     [ObservableProperty]
@@ -304,6 +307,7 @@ public partial class WorldViewModel : ViewModelBase
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
 
         ThaenTree = DatasetMapper.MapThaenTree(dataset.Characters[_selectedCharacterIndex]);
+        CompletedQuests = dataset.Characters[_selectedCharacterIndex].Save.QuestCompletedLog;
 
         ApplyFilter();
 
